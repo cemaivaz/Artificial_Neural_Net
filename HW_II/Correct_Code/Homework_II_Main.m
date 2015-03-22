@@ -63,10 +63,11 @@ hold off;
 %}
 
 
-hidd = [2];% 4 8];
+hidd = [2 4 8];
 cnt = 1;
 for i = 1:length(hidd)
     N = backprop([size_ hidd(i) 1],0.1,0.5,0.00033,xt,rt);
+    fprintf('Hidden unit #: %d, mse: %0.22f, last mse: %0.22f\n\n', hidd(i), mean(N.error), N.mse);
     str = strcat('Hidden unit #: ', int2str(hidd(i)));
     figure(cnt)
 
@@ -110,7 +111,8 @@ for i = 1:length(hidd)
     hold on;
     y_vals = ws * x_vals';
     plot(x_points, y_vals)
-    
+            title(str)
+
     hold off;
     cnt = cnt + 1;
     
@@ -127,6 +129,8 @@ for i = 1:length(hidd)
         
     end
     cnt = cnt + 1;
+            title(str)
+
     hold off;
     
     figure(cnt)
@@ -142,6 +146,8 @@ for i = 1:length(hidd)
         
         hold on;
     end
+            title(str)
+
     cnt = cnt + 1;
 %     hold off;
     
