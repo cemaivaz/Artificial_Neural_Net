@@ -114,7 +114,6 @@ presentations = 0; % we'll measure by epoch instead of presentation
 % necessary to reduce this if the number of training samples is large
 
 sseArr = [];
-valSseArr = [];
 while mse > smse && presentations < P * 1000
     sse = 0; % running total of squared error
     for p=1:P 
@@ -183,8 +182,8 @@ while mse > smse && presentations < P * 1000
     
    output = 2./(1 + exp(-layer_2nd)) - 1;
    
-    sumVal = sum((valD - output') .^ 2) / 2;
-    valSseArr = [valSseArr sumVal];
+    sumVal = (valD );
+    valSseArr = [valSseArr];
     
     
 end
@@ -196,4 +195,3 @@ Network.weights = w;
 Network.mse = mse;
 Network.presentations = presentations;
 Network.error = sseArr;
-Network.validError = valSseArr;

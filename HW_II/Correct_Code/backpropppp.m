@@ -36,7 +36,7 @@
 % Author: Dale Patterson
 % $Version: 2.2.1 $ $Date: 2.25.06 $
 % 
-function Network = backprop(L,n,m,smse,X,D, valX, valD)
+function Network = backprop(L,n,m,smse,X,D)
 
 % determine number of input samples, desired output and their dimensions
 [P,N] = size(X);
@@ -76,10 +76,13 @@ nLayers = length(L);
 % zero
 w = cell(nLayers-1,1); % a weight matrix between each layer
 for i=1:nLayers-2
-    w{i} = [.5 - rand(L(i+1),L(i)+1) ; zeros(1,L(i)+1)];
+    w{i} = [-0.01 + 0.02 * rand(L(i+1),L(i)+1) ; zeros(1,L(i)+1)];
 end
-w{end} = .5 - rand(L(end),L(end-1)+1);
+w{end} = -.01 + 0.02 * rand(L(end),L(end-1)+1);
 
+w{1}
+
+w{2}
 X = [X ones(P,1)]; % affix the column of bias activations to the input layer
 
 % preallocate activation,net vectors and delta weight matrices for faster 
@@ -114,7 +117,6 @@ presentations = 0; % we'll measure by epoch instead of presentation
 % necessary to reduce this if the number of training samples is large
 
 sseArr = [];
-valSseArr = [];
 while mse > smse && presentations < P * 1000
     sse = 0; % running total of squared error
     for p=1:P 
@@ -132,13 +134,16 @@ while mse > smse && presentations < P * 1000
             % for all layers but the output layer, the last node is the 
             % bias node and its activation is 1
             if i < nLayers-1        
-                a{i+1} = [2./(1+exp(-net{i}(1:end-1)))-1 ; 1];
-                
-%                 a{i+1} = [1./(1+exp(-net{i}(1:end-1))) ; 1];
+%                 a{i+1} = [2./(1+exp(-net{i}(1:end-1)))-1 ; 1];
+                hhh = a{i + 1};
+                a{i+1} = [1./(1+exp(-net{i}(1:end-1))) ; 1];
             else
-
-                a{i+1} = 2./(1+exp(-net{i})) - 1;
+%                 ww = w{i}
+%                 aa = a{i}
+%                 a{i+1} = 2./(1+exp(-net{i})) - 1;
 %                 a{i+1} = 1./(1+exp(-net{i}));
+
+                    a{i+1} = net{i};
             end
         end
         
@@ -150,43 +155,46 @@ while mse > smse && presentations < P * 1000
         % for the output nodes (S'(Output[net])*(Dp-Output[Activation])
         % then for each weight matrix, add n * delta * activation and
         % propagate delta to the previous layer
-        delta = (Dp-a{end}) .* (1+a{end}) .* (1-a{end});
-%         delta = (Dp-a{end}) .* a{end} .* (1-a{end});
+     delta = (Dp-a{end}) .* a{end} .* (1-a{end});
+        
+        
+        delta_ = n * (Dp-a{end});
+        
         for i=nLayers-1:-1:1
-            dw{i} = n * delta * a{i}' + (m .* dw{i});
-            w{i} = w{i} + dw{i};
-            if i > 1 % dont compute mod err for input layer 
-                delta = (1+a{i}).*(1-a{i}).*(delta'*w{i})';
+%             dw{i} = n * delta * a{i}' + (m .* dw{i});
+%             w{i} = w{i} + dw{i};
+%             if i > 1 % dont compute mod err for input layer 
+% %                 delta = (1+a{i}).*(1-a{i}).*(delta'*w{i})';
 %                 delta = (1+a{i}) .* a{i}.*(delta'*w{i})';
+%             end
+            
+
+            if i == nLayers-1
+                dw{i} = delta_ * a{i};
+%                 w{i} = w{i} + dw{i}';
+                allDelta{i} = dw{i};
+               % delta = ;
+%             elseif i > 1
+%                 dw{i} = ;
+%                 w{i} = w{i} + dw{i};
+%                 delta = ;
+            elseif i == 1
+                dw{i} = delta_ * w{i + 1}' .* (a{i + 1} .* (1 - a{i + 1}));
+                
+                dw{i} = dw{i} * a{i}';
+                allDelta{i} = dw{i};
+%                 w{i} = w{i} + dw{i};
             end
         end
+        for r_ = 1:size(allDelta, 1)
+            w{r_} = w{r_} + allDelta{r_};
+        end
     end
+    w
+    a
     presentations = presentations + P;
     mse = sse/2; %(P*M); % mse = 1/P * 1/M * summed squared error
     sseArr = [sseArr mse];
-    
-    %VALIDATION
-     
-    ws1 = w{1};
-    ws2 = w{2};
-   
-    %x_points = linspace(0, 1, 100)';
-    x_vals = [valX repmat(1, size(valX, 1), 1)];
- 
-    
-    resMod = ws1 * x_vals';
-    tmpRes = exp(-resMod(1:end-1,:));
-    res2 = 2./(1+tmpRes)-1;
-    res2Mod = [res2; repmat(1,1,size(valX, 1))];
-    
-    layer_2nd = ws2 * res2Mod;
-    
-   output = 2./(1 + exp(-layer_2nd)) - 1;
-   
-    sumVal = sum((valD - output') .^ 2) / 2;
-    valSseArr = [valSseArr sumVal];
-    
-    
 end
 
 
@@ -196,4 +204,3 @@ Network.weights = w;
 Network.mse = mse;
 Network.presentations = presentations;
 Network.error = sseArr;
-Network.validError = valSseArr;

@@ -35,6 +35,33 @@ rt = tmprt;
 size_ = size(xt, 2);
 
 
+%Validation data
+dataVal = textread('validation.txt', '%s');
+
+xtVal = dataVal(1:2:length(dataVal) - 1);
+
+rtVal = dataVal(2:2:length(dataVal));
+
+randOrd = randperm(length(xtVal));
+
+
+tmpXtVal = [];
+tmprtVal = [];
+for i = 1:length(xtVal)
+    tmpXtVal = [tmpXtVal; str2double(xtVal(i))];
+    tmprtVal = [tmprtVal; str2double(rtVal(i))];
+    
+end
+
+xtVal = tmpXtVal;
+rtVal = tmprtVal;
+
+
+
+xtVal = xtVal(randOrd);
+rtVal = rtVal(randOrd);
+
+
 
 %{
 ws1 = N.weights{1};
@@ -63,15 +90,17 @@ hold off;
 %}
 
 
-hidd = [2 4 8];
+hidd = [2];
 cnt = 1;
 for i = 1:length(hidd)
-    N = backprop([size_ hidd(i) 1],0.1,0.5,0.00033,xt,rt);
+    N = backprop([size_ hidd(i) 1],0.1,0.5,0.00033,xt,rt,xtVal, rtVal);
     fprintf('Hidden unit #: %d, mse: %0.22f, last mse: %0.22f\n\n', hidd(i), mean(N.error), N.mse);
     str = strcat('Hidden unit #: ', int2str(hidd(i)));
     figure(cnt)
 
-    plot((1:length(N.error)), N.error, '-');
+    plot((1:length(N.error)), N.error, '-r');
+    hold on;
+    plot((1:length(N.validError)), N.validError, '-b');
         title(str)
     xlabel('Epochs')
     ylabel('MSE')
