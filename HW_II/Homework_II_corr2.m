@@ -134,7 +134,7 @@ for h_ = 1:length(Hidd)
             
             
             zh = zeros(1, H + 1);
-            zh(1) = 1;
+            zh(1) = 1;      
             
             
             for h = 1:1:H
@@ -142,7 +142,6 @@ for h_ = 1:length(Hidd)
                 
                 
                 for d = 1:dimenNo
-
                     sum_ = sum_ + whj(h, d + 1) * xt_(d);
                 end
                 sum_ = sum_ + whj(h, 1);
@@ -338,7 +337,48 @@ y_huw2 = whj(2, 1) + x_huw * whj(2, 2);
 %Uncomment the below so as to see the data, and the underlying sine
 %function plotted
 
-plot(xt, rt, '+', x_huw, sin(6 * x_huw), '-')
+den_huw =zeros(1, length(x_huw));
+
+for i = 1:length(den_huw)
+    zh(1) = 1;
+    yiAll = zeros(1, len);
+    yiAllVal = zeros(1, len);
+    
+    zhVal(1) = 1;
+    for u = 1:length(x_huw)
+        xt_ = x_huw(u);
+       
+        for h = 1:1:H
+            sum_ = 0;
+            
+            for d = 1:dimenNo
+                
+                sum_ = sum_ + whj(h, d + 1) * xt_(d);
+                
+            end
+            sum_ = sum_ + whj(h, 1);
+            
+            %The output values of hidden units being calculated
+            zh(h + 1) = 1 / (1 + exp(-sum_));
+            
+        end
+        
+        
+        zh_ = zh;
+        
+        trZh = zh';
+        
+        for i = 1:K
+            %The outputs being updated
+            yi(i) = vih(i, :) * trZh;
+            
+        end
+        yiAll(u) = yi(1);
+        
+    end
+    %
+end
+plot(xt, rt, '+', x_huw, yiAll, '-')
 hold on;
 
 plot(x_huw, y_huw1, '--gs');
