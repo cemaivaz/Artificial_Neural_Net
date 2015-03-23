@@ -60,7 +60,7 @@ t = rt';
 
 [no N] = size(t)
 
-nh = 4
+nh = 8;
 
 % wih = .1*ones(nh,ni+1);
 
@@ -72,7 +72,7 @@ who = 0.02*randn(no,nh+1) - 0.01;
 
 n = 0.1; %learning parameter
 c = 0;
-while(c < 5000)
+while(c < 9000)
     c = c+1;
     % %for i = 1:length(x(1,:))
     
@@ -96,7 +96,7 @@ while(c < 5000)
             
             netk(k) = who(k,1:end-1)*outj' + who(k,end);
             outk(k) = netk(k);%1./(1+exp(-netk(k)));
-            delk(k, :) = n * (t(i) - outk(k));% * outj;%outk(k)*(1-outk(k))*(t(k,i)-outk(k));
+            delk(k, :) = n * (t(k, i) - outk(k));% * outj;%outk(k)*(1-outk(k))*(t(k,i)-outk(k));
         end
         % back propagation
         for j = 1:nh
@@ -119,7 +119,7 @@ while(c < 5000)
             
             for l = 1:nh
                 %who(k,l) = who(k,l)+.5*delk(k)*outj(l);
-                who(k, l) = who(k, l) + delk(k) * outj(1);
+                who(k, l) = who(k, l) + delk(k) * outj(l);
             end
             %who(k,l+1) = who(k,l+1)+1*delk(k)*1;
             
@@ -137,7 +137,7 @@ while(c < 5000)
             for ii = 1:ni
                 wih(j,ii) = wih(j,ii)+delj(j)*x(ii,i);
             end
-            wih(j,ii+1) = wih(j,ii+1)+1*delj(j)*1;
+            wih(j,ii+1) = wih(j,ii+1)+1*delj(j);
             
         end
     end
@@ -154,7 +154,7 @@ e = t-y;
 
 sum(e.^ 2)
 
-figure;
+figure(8);
 
 x_ = linspace(min(xt), max(xt), 100);
 
