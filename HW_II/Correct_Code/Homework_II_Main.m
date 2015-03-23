@@ -93,7 +93,8 @@ hold off;
 hidd = [2];
 cnt = 1;
 for i = 1:length(hidd)
-    N = backprop([size_ hidd(i) 1],0.1,0.5,0.00033,xt,rt,xtVal, rtVal);
+    %N = backprop([size_ hidd(i) 1],0.1,0.5,0.00033,xt,rt,xtVal, rtVal);
+    N = backprop2([size_ hidd(i) 1],0.1,0.5,0.00033,xt,rt,xtVal,rtVal);
     fprintf('Hidden unit #: %d, mse: %0.22f, last mse: %0.22f\n\n', hidd(i), mean(N.error), N.mse);
     str = strcat('Hidden unit #: ', int2str(hidd(i)));
     figure(cnt)
@@ -118,16 +119,32 @@ for i = 1:length(hidd)
     x_points = linspace(min(xt), max(xt),100)';
     
     %x_points = linspace(0, 1, 100)';
+%     x_vals = [x_points repmat(1, size(x_points, 1), 1)];
+%     
+%     resMod = ws1 * x_vals';
+%     tmpRes = exp(-resMod(1:end-1,:));
+%     res2 = 2./(1+tmpRes)-1;
+%     res2Mod = [res2; repmat(1,1,size(x_points, 1))];
+%     
+%     layer_2nd = ws2 * res2Mod;
+%     
+%    output = 2./(1 + exp(-layer_2nd)) - 1;
+   
+%silinecek
     x_vals = [x_points repmat(1, size(x_points, 1), 1)];
     
     resMod = ws1 * x_vals';
-    tmpRes = exp(-resMod(1:end-1,:));
-    res2 = 2./(1+tmpRes)-1;
+    
+   
+    tmpRes = [exp(-resMod(1:end-1,:))];
+    res2 = 1./(1+tmpRes);
     res2Mod = [res2; repmat(1,1,size(x_points, 1))];
     
     layer_2nd = ws2 * res2Mod;
     
-   output = 2./(1 + exp(-layer_2nd)) - 1;
+   output = layer_2nd;
+   
+   
     
     res = output;
     figure(cnt);
