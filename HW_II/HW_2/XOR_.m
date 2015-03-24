@@ -60,7 +60,7 @@ t = rt';
 
 [no N] = size(t)
 
-nh = 8;
+nh = 4;
 
 % wih = .1*ones(nh,ni+1);
 
