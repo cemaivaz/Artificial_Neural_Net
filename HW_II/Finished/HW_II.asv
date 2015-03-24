@@ -14,7 +14,7 @@ format long
 NH = [2; 4; 8];
 
 %The number of epochs is shown below
-thresh = 722;
+thresh = 800;
 
 fprintf('Model is being trained..\n\n');
 
@@ -82,7 +82,7 @@ tVal = rtVal(randOrd)';
 [nOut N] = size(t);
 
 
-
+errorAll = zeros(2, length(NH));
 for hiddNo = 1:length(NH)
     noH = NH(hiddNo);
     
@@ -150,7 +150,7 @@ for hiddNo = 1:length(NH)
         %Training data error being calculated for each epoch
         err = t-y;
         
-        sum_ = .5 * sum(err.^ 2);
+        sum_ = sum(err.^ 2) / N;
         
         error = [error sum_];
         
@@ -163,11 +163,15 @@ for hiddNo = 1:length(NH)
         %Validation data error being calculated
         err = tVal-yVal;
         
-        sum_ = .5 * sum(err.^ 2);
+        sum_ =  sum(err.^ 2) / N;
         
-        errorVal = [errorVal; sum_];
+        errorVal = [errorVal sum_];
     end
     
+    %Training error
+    errorAll(1, hiddNo) = error(end);
+    %Validation error
+    errorAll(2, hiddNo) = errorVal(end);
     
     %PLOTS
     figure();
@@ -191,7 +195,8 @@ for hiddNo = 1:length(NH)
         plot(x_, whj(hLine, :) * [x_; ones(1, len)], '.');
         hold on;
     end
-    
+    str = strcat(int2str(noH), ' hidden units');
+    title(str);
     hold off;
     
     
@@ -205,6 +210,7 @@ for hiddNo = 1:length(NH)
         plot(x_, h_(hLine, :), '.');
         hold on;
     end
+    title(str);
     hold off;
     figure();
     
@@ -217,6 +223,7 @@ for hiddNo = 1:length(NH)
         plot(x_, h_(hLine, :) * vih(hLine), '.');
         hold on;
     end
+    title(str);
     hold off;
     figure();
     
@@ -227,7 +234,14 @@ for hiddNo = 1:length(NH)
     
     hold on;
     %Validation error plotted
-    plot(xAxis, errorVal, '-r')
-        
+    plot(xAxis, errorVal, '.r')
+    
+    xlabel('Training Epochs');
+    ylabel('Mean Square Error');
+    title(str);
+    legend('Training', 'Validation');
     hold off;
 end
+
+fprintf('Error ');
+errorAll

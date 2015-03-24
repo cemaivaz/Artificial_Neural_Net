@@ -195,7 +195,8 @@ for hiddNo = 1:length(NH)
         plot(x_, whj(hLine, :) * [x_; ones(1, len)], '.');
         hold on;
     end
-    
+    str = strcat(int2str(noH), ' hidden units');
+    title(str);
     hold off;
     
     
@@ -209,6 +210,7 @@ for hiddNo = 1:length(NH)
         plot(x_, h_(hLine, :), '.');
         hold on;
     end
+    title(str);
     hold off;
     figure();
     
@@ -221,6 +223,7 @@ for hiddNo = 1:length(NH)
         plot(x_, h_(hLine, :) * vih(hLine), '.');
         hold on;
     end
+    title(str);
     hold off;
     figure();
     
@@ -232,6 +235,13 @@ for hiddNo = 1:length(NH)
     hold on;
     %Validation error plotted
     plot(xAxis, errorVal, '.r')
-        
+    
+    xlabel('Training Epochs');
+    ylabel('Mean Square Error');
+    title(str);
+    legend('Training', 'Validation');
     hold off;
 end
+
+fprintf('Errors are shown below (1st row = Training, 2nd row = Validation, columns represent different hidden unit numbers):');
+errorAll
