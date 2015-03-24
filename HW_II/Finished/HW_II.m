@@ -10,17 +10,16 @@ clc
 
 format long
 
+%Hidden unit numbers are shown below
 
 NH = [2; 4; 8];
 
 
-thresh = 1500;
+thresh = 722;
 
 fprintf('Model is being trained..\n\n');
 
 
-%Hidden unit numbers are shown below
-Hidd = [2; 4; 8];
 
 %Training data
 dataTr = textread('training.txt', '%s');
@@ -183,14 +182,36 @@ for hiddNo = 1:length(NH)
     plot(xt, rt, '+');
     hold on;
     for hLine = 1:size(wih, 1)
-        plot(x_, wih(hLine, :) * [x_; ones(1, len)]);
+        plot(x_, wih(hLine, :) * [x_; ones(1, len)], '.');
         hold on;
     end
     
     hold off;
     
+    
     figure();
-
+    plot(x_, y_, '-');
+    hold on;
+    plot(xt, rt, '+');
+    hold on;
+    for hLine = 1:size(h_, 1)
+        plot(x_, h_(hLine, :), '.');
+        hold on;
+    end
+    hold off;
+    figure();
+    
+    plot(x_, y_, '-');
+    hold on;
+    plot(xt, rt, '+');
+    hold on;
+    for hLine = 1:size(h_, 1)
+        plot(x_, h_(hLine, :) * who(hLine), '.');
+        hold on;
+    end
+    hold off;
+    figure();
+    
     
     xAxis = 1:length(error);
     plot(xAxis, error, '-')

@@ -10,17 +10,16 @@ clc
 
 format long
 
+%Hidden unit numbers are shown below
 
 NH = [2; 4; 8];
 
 
-thresh = 1500;
+thresh = 722;
 
 fprintf('Model is being trained..\n\n');
 
 
-%Hidden unit numbers are shown below
-Hidd = [2; 4; 8];
 
 %Training data
 dataTr = textread('training.txt', '%s');
@@ -154,14 +153,14 @@ for hiddNo = 1:length(NH)
         %Validation
         hVal = logsig(wih * [xVal; ones(1, N)]);
         
-        yVal = who * [h; ones(1, N)];
+        yVal = who * [hVal; ones(1, N)];
         
         
-        err = t-y;
+        err = tVal-yVal;
         
         sum_ = sum(err.^ 2);
         
-        error = [error sum_];
+        errorVal = [errorVal sum_];
     end
     
     
@@ -189,11 +188,36 @@ for hiddNo = 1:length(NH)
     
     hold off;
     
+    
     figure();
-
+    plot(x_, y_, '-');
+    hold on;
+    plot(xt, rt, '+');
+    hold on;
+    for hLine = 1:size(h_, 1)
+        plot(x_, h_(hLine, :));
+        hold on;
+    end
+    hold off;
+    figure();
+    
+    plot(x_, y_, '-');
+    hold on;
+    plot(xt, rt, '+');
+    hold on;
+    for hLine = 1:size(w, 1)
+        plot(x_, h_(hLine, :) * who(hLine));
+        hold on;
+    end
+    hold off;
+    figure();
+    
     
     xAxis = 1:length(error);
     plot(xAxis, error, '-')
     
-    
+    hold on;
+    plot(xAxis, errorVal, '-r')
+        
+    hold off;
 end
