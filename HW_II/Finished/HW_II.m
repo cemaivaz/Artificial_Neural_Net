@@ -1,7 +1,7 @@
 
 %Cem Rifki Aydin    2013800054
 %CmpE545    Hw 2
-%13.03.2015
+%20.03.2015
 
 
 close all;
@@ -11,11 +11,10 @@ clc
 format long
 
 %Hidden unit numbers are shown below
-
 NH = [2; 4; 8];
 
-
-thresh = 722;
+%The number of epochs is shown below
+thresh = 800;
 
 fprintf('Model is being trained..\n\n');
 
@@ -51,8 +50,8 @@ x = xt(randOrd)';
 t = rt(randOrd)';
 
 
-%VALIDATION DATA
-%Validation data
+%Validation data are being read
+
 dataVal = textread('validation.txt', '%s');
 
 xtVal = dataVal(1:2:length(dataVal) - 1);
@@ -78,111 +77,122 @@ rtVal = tmprtVal;
 xVal = xtVal(randOrd)';
 tVal = rtVal(randOrd)';
 
-[ni N] = size(x)
+[inpN N] = size(x);
 
-[no N] = size(t)
+[nOut N] = size(t);
 
 
-
+errorAll = zeros(2, length(NH));
 for hiddNo = 1:length(NH)
-    nh = NH(hiddNo);
+    noH = NH(hiddNo);
     
-    wih = 0.02*randn(nh,ni+1) - 0.01;
+     %Whj and Vih matrices are filled with random values
+    whj = 0.02*randn(noH,inpN+1) - 0.01;
     
-    who = 0.02*randn(no,nh+1) - 0.01;
+    vih = 0.02*randn(nOut,noH+1) - 0.01;
     
     n = 0.1; %learning parameter
 
     
-    error = [];
+    error = []; %Error for training data
     
-    errorVal = [];
+    errorVal = []; % Error for validation data
     
     for c = 0:1:thresh
         for i = 1:N
-            for j = 1:nh
+            for j = 1:noH
                 
-                netj(j) = wih(j,1:end-1)*x(:,i)+wih(j,end);
+                befSigm(j) = whj(j,1:end-1) * x (:,i) + whj(j,end);
                 
-                outj(j) = 1./(1+exp(-netj(j)));%logsig(netj(j));
+                %Sigmoid value being calculated below
+                Zh(j) = 1./(1+exp(-befSigm(j)));
             end
-            % hidden to output layer
-            for k = 1:no
+            %The regression output value being calculated below
+            for k = 1:nOut
                 
-                outk(k) = who(k,1:end-1)*outj' + who(k,end);
-                delk(k, :) = n * (t(k, i) - outk(k));
+                output(k) = vih(k,1:end-1)*Zh' + vih(k,end);
+                %DeltaVih values being calculated below
+                delVih(k, :) = n * (t(k, i) - output(k));
             end
-            % back propagation
-            for j = 1:nh
+            %DeltaWhj values for backpropagation being calculated below
+            for j = 1:noH
 
-                delj(j) =  n * (t(i) - outk(k)) * who(j) * outj(j) * (1 - outj(j));
+                delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Zh(j) * (1 - Zh(j));
             end
 
-            for k = 1:no
-                for l = 1:nh
-                    who(k, l) = who(k, l) + delk(k) * outj(l);
+            %The values of the matrix Vih are being updated below
+            for k = 1:nOut
+                for l = 1:noH
+                    vih(k, l) = vih(k, l) + delVih(k) * Zh(l);
                 end
 
-                who(k, l + 1) = who(k, l + 1) + delk(k) * 1;
+                vih(k, l + 1) = vih(k, l + 1) + delVih(k) * 1;
                 
             end
-            for j = 1:nh
+            %The values of the matrix Whj are being updated below
+            for j = 1:noH
 
                 
-                for ii = 1:ni
-                    wih(j,ii) = wih(j,ii)+delj(j) .* x(ii,i);
+                for hid_ = 1:inpN
+                    whj(j,hid_) = whj(j,hid_)+delWhj(j) .* x(hid_,i);
                 end
                 
-                wih(j,ii+1) = wih(j,ii+1)+1*delj(j);
+                whj(j,hid_+1) = whj(j,hid_+1)+1*delWhj(j);
                 
             end
         end
         
-        h = logsig(wih * [x; ones(1, N)]);
+        %Training
+        h = logsig(whj * [x; ones(1, N)]);
         
-        y = who * [h; ones(1, N)];
+        y = vih * [h; ones(1, N)];
         
-        
+        %Training data error being calculated for each epoch
         err = t-y;
         
-        sum_ = sum(err.^ 2);
+        sum_ = sum(err.^ 2) / N;
         
         error = [error sum_];
         
         
         %Validation
-        hVal = logsig(wih * [xVal; ones(1, N)]);
+        hVal = logsig(whj * [xVal; ones(1, N)]);
         
-        yVal = who * [hVal; ones(1, N)];
+        yVal = vih * [hVal; ones(1, N)];
         
-        
+        %Validation data error being calculated
         err = tVal-yVal;
         
-        sum_ = sum(err.^ 2);
+        sum_ =  sum(err.^ 2) / N;
         
         errorVal = [errorVal sum_];
     end
     
+    %Training error
+    errorAll(1, hiddNo) = error(end);
+    %Validation error
+    errorAll(2, hiddNo) = errorVal(end);
     
-    e = t-y;
-    
-    sum(e.^ 2)
-    
+    %PLOTS
     figure();
     
     x_ = linspace(min(xt), max(xt), 100);
     
     len = length(x_);
-    h_ = logsig(wih * [x_; ones(1, len)]);
+    h_ = logsig(whj * [x_; ones(1, len)]);
     
 
-    y_ = who * [h_; ones(1,len)]
+    
+    y_ = vih * [h_; ones(1,len)];
+    %Underlying function getting drawn through the below code
     plot(x_, y_, '-');
     hold on;
+    %Data are shown through the symbol '+' on the plot
     plot(xt, rt, '+');
     hold on;
-    for hLine = 1:size(wih, 1)
-        plot(x_, wih(hLine, :) * [x_; ones(1, len)], '.');
+    %The hyperplanes of the hidden unit weights on the first layer
+    for hLine = 1:size(whj, 1)
+        plot(x_, whj(hLine, :) * [x_; ones(1, len)], '.');
         hold on;
     end
     
@@ -194,6 +204,7 @@ for hiddNo = 1:length(NH)
     hold on;
     plot(xt, rt, '+');
     hold on;
+    %Hidden unit outputs
     for hLine = 1:size(h_, 1)
         plot(x_, h_(hLine, :), '.');
         hold on;
@@ -205,19 +216,22 @@ for hiddNo = 1:length(NH)
     hold on;
     plot(xt, rt, '+');
     hold on;
+    %Hidden unit outputs multiplied by the weights on the second layer
     for hLine = 1:size(h_, 1)
-        plot(x_, h_(hLine, :) * who(hLine), '.');
+        plot(x_, h_(hLine, :) * vih(hLine), '.');
         hold on;
     end
     hold off;
     figure();
     
-    
+
     xAxis = 1:length(error);
+    %Training error plotted
     plot(xAxis, error, '-')
     
     hold on;
-    plot(xAxis, errorVal, '-r')
+    %Validation error plotted
+    plot(xAxis, errorVal, '.r')
         
     hold off;
 end
