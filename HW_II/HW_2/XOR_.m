@@ -60,7 +60,7 @@ t = rt';
 
 [no N] = size(t)
 
-nh = 8;
+nh = 4;
 
 % wih = .1*ones(nh,ni+1);
 
@@ -108,8 +108,9 @@ while(c < 9000)
 %             delj(j) = outj(j)*(1-outj(j))*s;
             % %s=0;
             %delj(j) = n * (t(i) - outk(k)) * delk(1) * outj(j) * (1 - outj(j));% * x(:, i);
+            delj(j) =  n * (t(i) - outk(k)) * who(j) * outj(j) * (1 - outj(j));
         end
-        delj =  n * (t(i) - outk(k)) * who * outj(j) * (1 - outj(j));
+        %delj =  n * (t(i) - outk(k)) * who * outj(j) * (1 - outj(j));
         for k = 1:no
             
 %             for l = 1:nh
