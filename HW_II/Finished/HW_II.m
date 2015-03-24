@@ -96,6 +96,9 @@ for hiddNo = 1:length(NH)
 
     
     error = [];
+    
+    errorVal = [];
+    
     for c = 0:1:thresh
         for i = 1:N
             for j = 1:nh
@@ -146,6 +149,19 @@ for hiddNo = 1:length(NH)
         sum_ = sum(err.^ 2);
         
         error = [error sum_];
+        
+        
+        %Validation
+        hVal = logsig(wih * [xVal; ones(1, N)]);
+        
+        yVal = who * [hVal; ones(1, N)];
+        
+        
+        err = tVal-yVal;
+        
+        sum_ = sum(err.^ 2);
+        
+        errorVal = [errorVal sum_];
     end
     
     
@@ -176,8 +192,11 @@ for hiddNo = 1:length(NH)
     figure();
 
     
-    xAxis = 1:size(error);
+    xAxis = 1:length(error);
     plot(xAxis, error, '-')
     
-    
+    hold on;
+    plot(xAxis, errorVal, '-r')
+        
+    hold off;
 end
