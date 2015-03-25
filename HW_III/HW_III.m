@@ -11,7 +11,7 @@ clc
 format long
 
 %Hidden unit numbers are shown below
-NH = [2];
+NH = [2; 4; 8];
 
 %The number of epochs is shown below
 thresh = 800;
@@ -86,92 +86,95 @@ tVal = rtVal(randOrd)';
 errorAll = zeros(2, length(NH));
 
 %%%
-noH = 2;
 
-rands = randperm(N);
-
-rands = rands(1:noH);
-
-Hi_ = noH;
-randOrdP = randperm(N);
-randOrdP = randOrd(1:Hi_);
-
-
-allPoi = [xt rt];
-
-mi = allPoi(randOrdP', :);
-
-
-nCl = 0.058;
-
-miTmp = mi;
-cnt = 0;
-thr = 100;
-while cnt < thr
-    cnt = cnt + 1;
-    allPoi = allPoi(randperm(size(allPoi, 1))', :);
-    for ith = 1:size(allPoi, 1)
-        xt_ = allPoi(ith, :);
-        min_ = Inf;
-        minInd = -1;
-        for jth = 1:size(mi, 1)
-            eucl = sum((xt_ - mi(jth, :)) .^ 2) ^ .5;
-            if eucl < min_
-                min_ = eucl;
-                minInd = jth;
-            end
-        end
-        mi(minInd, :) = mi(minInd, :) + nCl * (xt_ - mi(minInd, :));
-        
-    end
-    nCl = nCl * 0.55;
-    if sum((miTmp - mi) .^ 2) < 0.000001
-        
-        break;
-    end
-    miTmp = mi;
-end
-
-sh = zeros(1, Hi_);
-clPert = zeros(1, size(allPoi, 1));
-for yth = 1:size(allPoi, 1)
-    xt_ = allPoi(yth, :);
-    min_ = Inf;
-    minInd = -1;
-    for zth = 1:size(mi, 1)
-        eucl = sum((xt_ - mi(zth, :)) .^ 2) .^ .5 ;
-        if eucl < min_
-            min_ = eucl;
-            minInd = zth;
-        end
-    end
-    
-    clPert(yth) = minInd;
-end
-
-
-for yth = 1:Hi_
-    clPoints = allPoi(clPert == yth, :);
-    
-    meanVal = mi(yth, :);
-    
-    max_ = -Inf;
-    maxInd = -1;
-    for zth = 1:size(clPoints, 1)
-        clPoint = clPoints(zth, :);
-        diff = sum((meanVal - clPoint) .^ 2) .^ 0.5;
-        if diff > max_
-            max_ = diff;
-            maxInd = zth;
-        end
-    end
-    sh(yth) = max_ / 2;
-end
 %%%
 
 for hiddNo = 1:length(NH)
     noH = NH(hiddNo);
+    %%%
     
+    
+    
+    rands = randperm(N);
+    
+    rands = rands(1:noH);
+    
+    Hi_ = noH;
+    randOrdP = randperm(N);
+    randOrdP = randOrd(1:Hi_);
+    
+    
+    allPoi = [xt rt];
+    
+    mi = allPoi(randOrdP', :);
+    
+    
+    nCl = 0.058;
+    
+    miTmp = mi;
+    cnt = 0;
+    thr = 100;
+    while cnt < thr
+        cnt = cnt + 1;
+        allPoi = allPoi(randperm(size(allPoi, 1))', :);
+        for ith = 1:size(allPoi, 1)
+            xt_ = allPoi(ith, :);
+            min_ = Inf;
+            minInd = -1;
+            for jth = 1:size(mi, 1)
+                eucl = sum((xt_ - mi(jth, :)) .^ 2) ^ .5;
+                if eucl < min_
+                    min_ = eucl;
+                    minInd = jth;
+                end
+            end
+            mi(minInd, :) = mi(minInd, :) + nCl * (xt_ - mi(minInd, :));
+            
+        end
+        nCl = nCl * 0.55;
+        if sum((miTmp - mi) .^ 2) < 0.000001
+            
+            break;
+        end
+        miTmp = mi;
+    end
+    
+    sh = zeros(1, Hi_);
+    clPert = zeros(1, size(allPoi, 1));
+    for yth = 1:size(allPoi, 1)
+        xt_ = allPoi(yth, :);
+        min_ = Inf;
+        minInd = -1;
+        for zth = 1:size(mi, 1)
+            eucl = sum((xt_ - mi(zth, :)) .^ 2) .^ .5 ;
+            if eucl < min_
+                min_ = eucl;
+                minInd = zth;
+            end
+        end
+        
+        clPert(yth) = minInd;
+    end
+    
+    
+    for yth = 1:Hi_
+        clPoints = allPoi(clPert == yth, :);
+        
+        meanVal = mi(yth, :);
+        
+        max_ = -Inf;
+        maxInd = -1;
+        for zth = 1:size(clPoints, 1)
+            clPoint = clPoints(zth, :);
+            diff = sum((meanVal - clPoint) .^ 2) .^ 0.5;
+            if diff > max_
+                max_ = diff;
+                maxInd = zth;
+            end
+        end
+        sh(yth) = max_ / 2;
+    end
+    %%%
     
     %Whj and Vih matrices are filled with random values
     whj = 0.02*randn(noH,inpN+1) - 0.01;
@@ -208,6 +211,11 @@ for hiddNo = 1:length(NH)
                 
                 %Sigmoid value being calculated below
                 Ph(j) = 1./(1+exp(-befSigm(j)));
+                
+                
+                Ph(j) = exp(- () / 1 * sh(j) ^ 2);
+                %UPD
+                
             end
             %The regression output value being calculated below
             for k = 1:nOut
