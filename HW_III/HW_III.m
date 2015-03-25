@@ -91,7 +91,7 @@ clCentY = tVal(rands);
 
 errorAll = zeros(2, length(NH));
 
-Hi_ = 3;
+Hi_ = 8;
 randOrdP = randperm(N);
 randOrdP = randOrd(1:Hi_);
 
@@ -101,28 +101,31 @@ allPoi = [xt rt];
 mi = allPoi(randOrdP', :);
 
 
-nCl = 0.5;
+nCl = 0.058;
 
-miTmp = mi
+miTmp = mi;
 cnt = 0;
-while cnt < 100
+thr = 100;
+while cnt < thr
     cnt = cnt + 1;
+    allPoi = allPoi(randperm(size(allPoi, 1))', :);
     for i = 1:size(allPoi, 1)
         xt_ = allPoi(i, :);
         min_ = Inf;
         minInd = -1;
         for j = 1:size(mi, 1)
-            if xt_ - mi(j, :) < min_
-                min_ = xt_ - mi(j, :);
+            if abs(xt_ - mi(j, :)) < min_
+                min_ = abs(xt_ - mi(j, :));
                 minInd = j;
             end
         end
-        mi(minInd, :) = mi(minInd, :) + nCl * (xt_ - mi(minInd, :));
+        mi(minInd, :) = mi(minInd, :) + nCl * abs(xt_ - mi(minInd, :));
+
     end
-    nCl = nCl * 0.80;
-    if sum((miTmp - mi) .^ 2) < 0.000001
-        break;
-    end
+    nCl = nCl * 0.55;
+%     if sum((miTmp - mi) .^ 2) < 0.00000001
+%         break;
+%     end
     miTmp = mi;
 end
 
@@ -260,6 +263,8 @@ for hiddNo = 1:length(NH)
     plot(x_, y_, '-');
     hold on;
     plot(xt, rt, '+');
+    hold on;
+    plot(mi(:,1)', mi(:, 2)', 'rx');
     hold on;
     %Hidden unit outputs multiplied by the weights on the second layer
     for hLine = 1:size(h_, 1)
