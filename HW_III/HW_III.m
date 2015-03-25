@@ -109,14 +109,14 @@ thr = 100;
 while cnt < thr
     cnt = cnt + 1;
     allPoi = allPoi(randperm(size(allPoi, 1))', :);
-    for i = 1:size(allPoi, 1)
-        xt_ = allPoi(i, :);
+    for ith = 1:size(allPoi, 1)
+        xt_ = allPoi(ith, :);
         min_ = Inf;
         minInd = -1;
-        for j = 1:size(mi, 1)
-            if abs(xt_ - mi(j, :)) < min_
-                min_ = abs(xt_ - mi(j, :));
-                minInd = j;
+        for jth = 1:size(mi, 1)
+            if abs(xt_ - mi(jth, :)) < min_
+                min_ = abs(xt_ - mi(jth, :));
+                minInd = jth;
             end
         end
         mi(minInd, :) = mi(minInd, :) + nCl * abs(xt_ - mi(minInd, :));
@@ -128,6 +128,7 @@ while cnt < thr
     end
     miTmp = mi;
 end
+
 
 for hiddNo = 1:length(NH)
     noH = NH(hiddNo);
