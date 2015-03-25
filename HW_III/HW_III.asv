@@ -114,8 +114,9 @@ while cnt < thr
         min_ = Inf;
         minInd = -1;
         for jth = 1:size(mi, 1)
-            if sum((xt_ - mi(jth, :)) .^ 2) ^ .5 < min_
-                min_ = abs(xt_ - mi(jth, :));
+            eucl = sum((xt_ - mi(jth, :)) .^ 2) ^ .5;
+            if eucl < min_
+                min_ = eucl;
                 minInd = jth;
             end
         end
@@ -137,8 +138,9 @@ for yth = 1:size(allPoi, 1)
     min_ = Inf;
     minInd = -1;
     for zth = 1:size(mi, 1)
-        if sum(xt_ - mi(zth, :)) < min_
-            min_ = abs(xt_ - mi(zth, :));
+        eucl = sum((xt_ - mi(zth, :)) .^ 2) .^ .5 ; 
+        if eucl < min_
+            min_ = eucl;
             minInd = zth;
         end
     end
@@ -147,7 +149,7 @@ for yth = 1:size(allPoi, 1)
 end
 
 
-for yth = 1:length(Hi_)
+for yth = 1:Hi_
     clPoints = allPoi(clPert == yth, :);
     
     meanVal = mi(yth, :);
@@ -156,13 +158,12 @@ for yth = 1:length(Hi_)
     maxInd = -1;
     for zth = 1:size(clPoints, 1)
         clPoint = clPoints(zth, :);
-        diff = abs(meanVal - clPoint);
+        diff = sum((meanVal - clPoint) .^ 2) .^ 0.5;
         if diff > max_
             max_ = diff;
             maxInd = zth;
         end
     end
-    
     sh(yth) = max_ / 2;
 end
 
@@ -171,6 +172,10 @@ for hiddNo = 1:length(NH)
     
      %Whj and Vih matrices are filled with random values
     whj = 0.02*randn(noH,inpN+1) - 0.01;
+    
+    
+    
+    
     
     vih = 0.02*randn(nOut,noH+1) - 0.01;
     
@@ -188,25 +193,25 @@ for hiddNo = 1:length(NH)
                 befSigm(j) = whj(j,1:end-1) * x (:,i) + whj(j,end);
                 
                 %Sigmoid value being calculated below
-                Zh(j) = 1./(1+exp(-befSigm(j)));
+                Ph(j) = 1./(1+exp(-befSigm(j)));
             end
             %The regression output value being calculated below
             for k = 1:nOut
                 
-                output(k) = vih(k,1:end-1)*Zh' + vih(k,end);
+                output(k) = vih(k,1:end-1)*Ph' + vih(k,end);
                 %DeltaVih values being calculated below
                 delVih(k, :) = n * (t(k, i) - output(k));
             end
             %DeltaWhj values for backpropagation being calculated below
             for j = 1:noH
 
-                delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Zh(j) * (1 - Zh(j));
+                delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Ph(j) * (1 - Ph(j));
             end
 
             %The values of the matrix Vih are being updated below
             for k = 1:nOut
                 for l = 1:noH
-                    vih(k, l) = vih(k, l) + delVih(k) * Zh(l);
+                    vih(k, l) = vih(k, l) + delVih(k) * Ph(l);
                 end
 
                 vih(k, l + 1) = vih(k, l + 1) + delVih(k) * 1;

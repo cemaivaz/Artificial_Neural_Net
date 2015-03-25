@@ -173,6 +173,9 @@ for hiddNo = 1:length(NH)
      %Whj and Vih matrices are filled with random values
     whj = 0.02*randn(noH,inpN+1) - 0.01;
     
+    
+    
+    
     vih = 0.02*randn(nOut,noH+1) - 0.01;
     
     n = 0.1; %learning parameter
@@ -189,25 +192,25 @@ for hiddNo = 1:length(NH)
                 befSigm(j) = whj(j,1:end-1) * x (:,i) + whj(j,end);
                 
                 %Sigmoid value being calculated below
-                Zh(j) = 1./(1+exp(-befSigm(j)));
+                Ph(j) = 1./(1+exp(-befSigm(j)));
             end
             %The regression output value being calculated below
             for k = 1:nOut
                 
-                output(k) = vih(k,1:end-1)*Zh' + vih(k,end);
+                output(k) = vih(k,1:end-1)*Ph' + vih(k,end);
                 %DeltaVih values being calculated below
                 delVih(k, :) = n * (t(k, i) - output(k));
             end
             %DeltaWhj values for backpropagation being calculated below
             for j = 1:noH
 
-                delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Zh(j) * (1 - Zh(j));
+                delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Ph(j) * (1 - Ph(j));
             end
 
             %The values of the matrix Vih are being updated below
             for k = 1:nOut
                 for l = 1:noH
-                    vih(k, l) = vih(k, l) + delVih(k) * Zh(l);
+                    vih(k, l) = vih(k, l) + delVih(k) * Ph(l);
                 end
 
                 vih(k, l + 1) = vih(k, l + 1) + delVih(k) * 1;
