@@ -91,14 +91,14 @@ clCentY = tVal(rands);
 
 errorAll = zeros(2, length(NH));
 
-H_ = 3;
-randOrd = randperm(N);
-randOrd = randOrd(1:H_);
+Hi_ = 3;
+randOrdP = randperm(N);
+randOrdP = randOrd(1:Hi_);
 
 
 allPoi = [xt rt];
 
-mi = allPoi(randOrd', :);
+mi = allPoi(randOrdP', :);
 
 
 nCl = 0.5;
@@ -109,18 +109,18 @@ while cnt < 100
     cnt = cnt + 1;
     for i = 1:size(allPoi, 1)
         xt_ = allPoi(i, :);
-        min = Inf;
+        min_ = Inf;
         minInd = -1;
         for j = 1:size(mi, 1)
-            if xt_ - mi(j, :) < min
-                min = xt_ - mi(j, :);
+            if xt_ - mi(j, :) < min_
+                min_ = xt_ - mi(j, :);
                 minInd = j;
             end
         end
         mi(minInd, :) = mi(minInd, :) + nCl * (xt_ - mi(minInd, :));
     end
     nCl = nCl * 0.80;
-    if sum((miTmp - mi) .^ 2) < 0.00001
+    if sum((miTmp - mi) .^ 2) < 0.000001
         break;
     end
     miTmp = mi;
