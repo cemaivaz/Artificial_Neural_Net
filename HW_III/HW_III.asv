@@ -91,24 +91,79 @@ clCentY = tVal(rands);
 
 errorAll = zeros(2, length(NH));
 
-H_ = 3;
-randOrd = randperm(N);
-randOrd = randOrd(1:H_);
+Hi_ = 8;
+randOrdP = randperm(N);
+randOrdP = randOrd(1:Hi_);
 
 
 allPoi = [xt rt];
 
-mi = allPoi(randOrd', :);
+mi = allPoi(randOrdP', :);
 
-conv =  
 
-while
-    for i = 1:size(allPoi, 1)
-        
-        for j = 1:size(mi, 1)
-            
+nCl = 0.058;
+
+miTmp = mi;
+cnt = 0;
+thr = 100;
+while cnt < thr
+    cnt = cnt + 1;
+    allPoi = allPoi(randperm(size(allPoi, 1))', :);
+    for ith = 1:size(allPoi, 1)
+        xt_ = allPoi(ith, :);
+        min_ = Inf;
+        minInd = -1;
+        for jth = 1:size(mi, 1)
+            if sum((xt_ - mi(jth, :)) .^ 2) ^ .5 < min_
+                min_ = abs(xt_ - mi(jth, :));
+                minInd = jth;
+            end
+        end
+        mi(minInd, :) = mi(minInd, :) + nCl * sum((xt_ - mi(minInd, :)) .^ 2) ^.5;
+
+    end
+    nCl = nCl * 0.55;
+    if sum((miTmp - mi) .^ 2) < 0.000001
+
+        break;
+    end
+    miTmp = mi;
+end
+
+sh = zeros(1, Hi_);
+clPert = zeros(1, size(allPoi, 1));
+for yth = 1:size(allPoi, 1)
+    xt_ = allPoi(yth, :);
+    min_ = Inf;
+    minInd = -1;
+    for zth = 1:size(mi, 1)
+        if sum(xt_ - mi(zth, :)) < min_
+            min_ = abs(xt_ - mi(zth, :));
+            minInd = zth;
         end
     end
+    
+    clPert(yth) = minInd;
+end
+
+
+for yth = 1:length(Hi_)
+    clPoints = allPoi(clPert == yth, :);
+    
+    meanVal = mi(yth, :);
+    
+    max_ = -Inf;
+    maxInd = -1;
+    for zth = 1:size(clPoints, 1)
+        clPoint = clPoints(zth, :);
+        diff = abs(meanVal - clPoint);
+        if diff > max_
+            max_ = diff;
+            maxInd = zth;
+        end
+    end
+    
+    sh(yth) = max_ / 2;
 end
 
 for hiddNo = 1:length(NH)
@@ -245,6 +300,8 @@ for hiddNo = 1:length(NH)
     plot(x_, y_, '-');
     hold on;
     plot(xt, rt, '+');
+    hold on;
+    plot(mi(:,1)', mi(:, 2)', 'rx');
     hold on;
     %Hidden unit outputs multiplied by the weights on the second layer
     for hLine = 1:size(h_, 1)

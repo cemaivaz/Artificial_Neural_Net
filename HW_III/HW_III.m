@@ -114,21 +114,58 @@ while cnt < thr
         min_ = Inf;
         minInd = -1;
         for jth = 1:size(mi, 1)
-            if abs(xt_ - mi(jth, :)) < min_
-                min_ = abs(xt_ - mi(jth, :));
+            eucl = sum((xt_ - mi(jth, :)) .^ 2) ^ .5;
+            if eucl < min_
+                min_ = eucl;
                 minInd = jth;
             end
         end
-        mi(minInd, :) = mi(minInd, :) + nCl * abs(xt_ - mi(minInd, :));
+        mi(minInd, :) = mi(minInd, :) + nCl * sum((xt_ - mi(minInd, :)) .^ 2) ^.5;
 
     end
     nCl = nCl * 0.55;
     if sum((miTmp - mi) .^ 2) < 0.000001
+
         break;
     end
     miTmp = mi;
 end
 
+sh = zeros(1, Hi_);
+clPert = zeros(1, size(allPoi, 1));
+for yth = 1:size(allPoi, 1)
+    xt_ = allPoi(yth, :);
+    min_ = Inf;
+    minInd = -1;
+    for zth = 1:size(mi, 1)
+        eucl = sum((xt_ - mi(zth, :)) .^ 2) .^ .5 ; 
+        if eucl < min_
+            min_ = eucl;
+            minInd = zth;
+        end
+    end
+    
+    clPert(yth) = minInd;
+end
+
+
+for yth = 1:Hi_
+    clPoints = allPoi(clPert == yth, :);
+    
+    meanVal = mi(yth, :);
+    
+    max_ = -Inf;
+    maxInd = -1;
+    for zth = 1:size(clPoints, 1)
+        clPoint = clPoints(zth, :);
+        diff = sum((meanVal - clPoint) .^ 2) .^ 0.5;
+        if diff > max_
+            max_ = diff;
+            maxInd = zth;
+        end
+    end
+    sh(yth) = max_ / 2;
+end
 
 for hiddNo = 1:length(NH)
     noH = NH(hiddNo);
