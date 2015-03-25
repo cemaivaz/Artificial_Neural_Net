@@ -91,95 +91,109 @@ clCentY = tVal(rands);
 
 errorAll = zeros(2, length(NH));
 
-Hi_ = 8;
-randOrdP = randperm(N);
-randOrdP = randOrd(1:Hi_);
 
-
-allPoi = [xt rt];
-
-mi = allPoi(randOrdP', :);
-
-
-nCl = 0.058;
-
-miTmp = mi;
-cnt = 0;
-thr = 100;
-while cnt < thr
-    cnt = cnt + 1;
-    allPoi = allPoi(randperm(size(allPoi, 1))', :);
-    for ith = 1:size(allPoi, 1)
-        xt_ = allPoi(ith, :);
-        min_ = Inf;
-        minInd = -1;
-        for jth = 1:size(mi, 1)
-            eucl = sum((xt_ - mi(jth, :)) .^ 2) ^ .5;
-            if eucl < min_
-                min_ = eucl;
-                minInd = jth;
-            end
-        end
-        mi(minInd, :) = mi(minInd, :) + nCl * sum((xt_ - mi(minInd, :)) .^ 2) ^.5;
-
-    end
-    nCl = nCl * 0.55;
-    if sum((miTmp - mi) .^ 2) < 0.000001
-
-        break;
-    end
-    miTmp = mi;
-end
-
-sh = zeros(1, Hi_);
-clPert = zeros(1, size(allPoi, 1));
-for yth = 1:size(allPoi, 1)
-    xt_ = allPoi(yth, :);
-    min_ = Inf;
-    minInd = -1;
-    for zth = 1:size(mi, 1)
-        eucl = sum((xt_ - mi(zth, :)) .^ 2) .^ .5 ; 
-        if eucl < min_
-            min_ = eucl;
-            minInd = zth;
-        end
-    end
-    
-    clPert(yth) = minInd;
-end
-
-
-for yth = 1:Hi_
-    clPoints = allPoi(clPert == yth, :);
-    
-    meanVal = mi(yth, :);
-    
-    max_ = -Inf;
-    maxInd = -1;
-    for zth = 1:size(clPoints, 1)
-        clPoint = clPoints(zth, :);
-        diff = sum((meanVal - clPoint) .^ 2) .^ 0.5;
-        if diff > max_
-            max_ = diff;
-            maxInd = zth;
-        end
-    end
-    sh(yth) = max_ / 2;
-end
 
 for hiddNo = 1:length(NH)
     noH = NH(hiddNo);
     
-     %Whj and Vih matrices are filled with random values
+    Hi_ = noH;
+    randOrdP = randperm(N);
+    randOrdP = randOrd(1:Hi_);
+    
+    
+    allPoi = [xt rt];
+    
+    mi = allPoi(randOrdP', :);
+    
+    
+    nCl = 0.058;
+    
+    miTmp = mi;
+    cnt = 0;
+    thr = 100;
+    while cnt < thr
+        cnt = cnt + 1;
+        allPoi = allPoi(randperm(size(allPoi, 1))', :);
+        for ith = 1:size(allPoi, 1)
+            xt_ = allPoi(ith, :);
+            min_ = Inf;
+            minInd = -1;
+            for jth = 1:size(mi, 1)
+                eucl = sum((xt_ - mi(jth, :)) .^ 2) ^ .5;
+                if eucl < min_
+                    min_ = eucl;
+                    minInd = jth;
+                end
+            end
+            mi(minInd, :) = mi(minInd, :) + nCl * sum((xt_ - mi(minInd, :)) .^ 2) ^.5;
+            
+        end
+        nCl = nCl * 0.55;
+        if sum((miTmp - mi) .^ 2) < 0.000001
+            
+            break;
+        end
+        miTmp = mi;
+    end
+    
+    sh = zeros(1, Hi_);
+    clPert = zeros(1, size(allPoi, 1));
+    for yth = 1:size(allPoi, 1)
+        xt_ = allPoi(yth, :);
+        min_ = Inf;
+        minInd = -1;
+        for zth = 1:size(mi, 1)
+            eucl = sum((xt_ - mi(zth, :)) .^ 2) .^ .5 ;
+            if eucl < min_
+                min_ = eucl;
+                minInd = zth;
+            end
+        end
+        
+        clPert(yth) = minInd;
+    end
+    
+    
+    for yth = 1:Hi_
+        clPoints = allPoi(clPert == yth, :);
+        
+        meanVal = mi(yth, :);
+        
+        max_ = -Inf;
+        maxInd = -1;
+        for zth = 1:size(clPoints, 1)
+            clPoint = clPoints(zth, :);
+            diff = sum((meanVal - clPoint) .^ 2) .^ 0.5;
+            if diff > max_
+                max_ = diff;
+                maxInd = zth;
+            end
+        end
+        sh(yth) = max_ / 2;
+    end
+    
+    %Whj and Vih matrices are filled with random values
     whj = 0.02*randn(noH,inpN+1) - 0.01;
+    
+    %upd
+    Mhj = mi;
+    Sh = sh;
     
     
     
     
     vih = 0.02*randn(nOut,noH+1) - 0.01;
     
+    
+    %upd
+    Wih = 0.02*randn(nOut, noH + 1) - 0.01;
+    
+    
+    x = allPoi(:, 1)';
+    t = allPoi(:, 2)';
+    
     n = 0.1; %learning parameter
-
+    
     
     error = []; %Error for training data
     
@@ -203,22 +217,22 @@ for hiddNo = 1:length(NH)
             end
             %DeltaWhj values for backpropagation being calculated below
             for j = 1:noH
-
+                
                 delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Ph(j) * (1 - Ph(j));
             end
-
+            
             %The values of the matrix Vih are being updated below
             for k = 1:nOut
                 for l = 1:noH
                     vih(k, l) = vih(k, l) + delVih(k) * Ph(l);
                 end
-
+                
                 vih(k, l + 1) = vih(k, l + 1) + delVih(k) * 1;
                 
             end
             %The values of the matrix Whj are being updated below
             for j = 1:noH
-
+                
                 
                 for hid_ = 1:inpN
                     whj(j,hid_) = whj(j,hid_)+delWhj(j) .* x(hid_,i);
@@ -268,7 +282,7 @@ for hiddNo = 1:length(NH)
     len = length(x_);
     h_ = logsig(whj * [x_; ones(1, len)]);
     
-
+    
     
     y_ = vih * [h_; ones(1,len)];
     %Underlying function getting drawn through the below code
@@ -316,7 +330,7 @@ for hiddNo = 1:length(NH)
     hold off;
     figure();
     
-
+    
     xAxis = 1:length(error);
     %Training error plotted
     plot(xAxis, error, '-')
