@@ -103,8 +103,10 @@ mi = allPoi(randOrd', :);
 
 nCl = 0.5;
 
-miTmp = mi;
-while 1 == 1
+miTmp = mi
+cnt = 0;
+while cnt < 100
+    cnt = cnt + 1;
     for i = 1:size(allPoi, 1)
         xt_ = allPoi(i, :);
         min = Inf;
@@ -118,7 +120,7 @@ while 1 == 1
         mi(minInd, :) = mi(minInd, :) + nCl * (xt_ - mi(minInd, :));
     end
     nCl = nCl * 0.80;
-    if sum((miTmp - mi) .^ 2) < 0.001
+    if sum((miTmp - mi) .^ 2) < 0.00001
         break;
     end
     miTmp = mi;
