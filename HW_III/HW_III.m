@@ -123,9 +123,9 @@ while cnt < thr
 
     end
     nCl = nCl * 0.55;
-%     if sum((miTmp - mi) .^ 2) < 0.00000001
-%         break;
-%     end
+    if sum((miTmp - mi) .^ 2) < 0.000001
+        break;
+    end
     miTmp = mi;
 end
 
