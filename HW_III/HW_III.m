@@ -213,8 +213,8 @@ for hiddNo = 1:length(NH)
                 Ph(j) = 1./(1+exp(-befSigm(j)));
                 
                 
-                Ph(j) = exp(- () / 1 * sh(j) ^ 2);
                 %UPD
+                Ph(j) = exp(-sum((allPoi(i, :) - mi(j)) .^ 2) ^ 2 / (sh(j) ^ 2));
                 
             end
             %The regression output value being calculated below
@@ -223,11 +223,19 @@ for hiddNo = 1:length(NH)
                 output(k) = vih(k,1:end-1)*Ph' + vih(k,end);
                 %DeltaVih values being calculated below
                 delVih(k, :) = n * (t(k, i) - output(k));
+                
+                %UPD
+                output(k) = Wih(k,1:end-1)*Ph' + Wih(k,end);
+                %DeltaVih values being calculated below
+                delWih(k, :) = n * (allPoi(i, 2) - output(k));
             end
             %DeltaWhj values for backpropagation being calculated below
             for j = 1:noH
                 
                 delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Ph(j) * (1 - Ph(j));
+            
+                %UPDATE
+                
             end
             
             %The values of the matrix Vih are being updated below
