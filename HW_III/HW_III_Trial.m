@@ -185,12 +185,14 @@ for hiddNo = 1:length(NH)
     whj = 0.02*randn(noH,inpN+1) - 0.01;
     
     %upd
-    sh = sh + 0.08;
+    
+    sh(sh == 0) = min(sh(sh ~= 0)) / 2;
+
     Mhj = mi;
     Sh = sh;
     
     
-    
+   
     
     vih = 0.02*randn(nOut,noH+1) - 0.01;
     
@@ -212,12 +214,12 @@ for hiddNo = 1:length(NH)
     Ph = zeros(1, Hi_);
     
     for c = 0:1:thresh
-        
-        Ph
+
         for i = 1:N
             firstX = allPoi(i, 1);
             secX = t(i, 1);
-            
+                    
+           
             for j = 1:noH
                 
 %                 befSigm(j) = whj(j,1:end-1) * x (:,i) + whj(j,end);
@@ -298,8 +300,28 @@ for hiddNo = 1:length(NH)
 %                 else
 %                     Sh(j) = newSh;
 %                 end
-                Mhj(j) = Mhj(j) + delMhj(j, :);
-                Sh(j) = Sh(j) + delSh(j);
+                %Mhj(j) = Mhj(j) + delMhj(j, :);
+                %Sh(j) = Sh(j) + delSh(j);
+                
+                tmpSh = Sh(j) + delSh(j);
+                theta = sum(sh) / 12;
+                if tmpSh < theta
+                    Sh(j) = theta;
+                elseif tmpSh > max(xt) - min(xt)
+                    Sh(j) = (max(xt) - min(xt)) / 2;
+                else
+                    Sh(j) = tmpSh;
+                end
+                
+                tmpMhj = Mhj(j) + delMhj(j, :);
+                if tmpMhj < min(xt)
+                    Mh(j) = min(xt) + (max(xt) - min(xt)) / Hi_;
+                elseif tmpMhj > max(xt)
+                    Sh(j) = max(xt) - (max(xt) - min(xt)) / Hi_;
+                else
+                    Mhj(j) =tmpMhj;
+                end
+                
                 %                 Mhj(j, hid_ + 1) = Mhj(j, hid_ + 1) + delMhj(j);
                 %                 Sh(j) = Sh(j) + delSh(j);
                 
