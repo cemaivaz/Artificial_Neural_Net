@@ -105,9 +105,9 @@ for hiddNo = 1:length(NH)
     randOrdP = randOrd(1:Hi_);
     
     
-    allPoi = [xt rt];
+    allPoi_ = [xt rt];
     
-    mi = allPoi(randOrdP', :);
+    mi = allPoi_(randOrdP', 1);
     
     
     nCl = 0.058;
@@ -115,22 +115,25 @@ for hiddNo = 1:length(NH)
     miTmp = mi;
     cnt = 0;
     thr = 100;
+    t = [];
     while cnt < thr
         
         cnt = cnt + 1;
-        allPoi = allPoi(randperm(size(allPoi, 1))', :);
+        randOrd = randperm(size(allPoi_, 1))';
+        t = allPoi_(randOrd, 2);
+        allPoi = allPoi_(randOrd, 1);
         for ith = 1:size(allPoi, 1)
-            xt_ = allPoi(ith, :);
+            xt_ = allPoi(ith, 1);
             min_ = Inf;
             minInd = -1;
             for jth = 1:size(mi, 1)
-                eucl = sum((xt_ - mi(jth, :)) .^ 2) ^ .5;
+                eucl = sum((xt_ - mi(jth, 1)) .^ 2) ^ .5;
                 if eucl < min_
                     min_ = eucl;
                     minInd = jth;
                 end
             end
-            mi(minInd, :) = mi(minInd, :) + nCl * (xt_ - mi(minInd, :));
+            mi(minInd, 1) = mi(minInd, 1) + nCl * (xt_ - mi(minInd, 1));
             
         end
         nCl = nCl * 0.55;
@@ -144,11 +147,11 @@ for hiddNo = 1:length(NH)
     sh = zeros(1, Hi_);
     clPert = zeros(1, size(allPoi, 1));
     for yth = 1:size(allPoi, 1)
-        xt_ = allPoi(yth, :);
+        xt_ = allPoi(yth, 1);
         min_ = Inf;
         minInd = -1;
         for zth = 1:size(mi, 1)
-            eucl = sum((xt_ - mi(zth, :)) .^ 2) .^ .5 ;
+            eucl = sum((xt_ - mi(zth, 1)) .^ 2) .^ .5 ;
             if eucl < min_
                 min_ = eucl;
                 minInd = zth;
@@ -160,14 +163,14 @@ for hiddNo = 1:length(NH)
     
     
     for yth = 1:Hi_
-        clPoints = allPoi(clPert == yth, :);
+        clPoints = allPoi(clPert == yth, 1);
         
-        meanVal = mi(yth, :);
+        meanVal = mi(yth, 1);
         
         max_ = -Inf;
         maxInd = -1;
         for zth = 1:size(clPoints, 1)
-            clPoint = clPoints(zth, :);
+            clPoint = clPoints(zth, 1);
             diff = sum((meanVal - clPoint) .^ 2) .^ 0.5;
             if diff > max_
                 max_ = diff;
@@ -182,6 +185,7 @@ for hiddNo = 1:length(NH)
     whj = 0.02*randn(noH,inpN+1) - 0.01;
     
     %upd
+    sh = sh + 0.08;
     Mhj = mi;
     Sh = sh;
     
@@ -196,7 +200,7 @@ for hiddNo = 1:length(NH)
     
     
     x = allPoi(:, 1)';
-    t = allPoi(:, 2)';
+    %t = allPoi(:, 2)';
     
     n = 0.19; %learning parameter
     
@@ -212,7 +216,7 @@ for hiddNo = 1:length(NH)
         Ph
         for i = 1:N
             firstX = allPoi(i, 1);
-            secX = allPoi(i, 2);
+            secX = t(i, 1);
             
             for j = 1:noH
                 
@@ -223,7 +227,7 @@ for hiddNo = 1:length(NH)
                 
                 
                 %UPD
-                Ph(j) = exp(-sum(([allPoi(i, 1) 0] - Mhj(j, :)) .^ 2) / (2 * sh(j) ^ 2));
+                Ph(j) = exp(-sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) / (2 * sh(j) ^ 2));
                 
             end
             %The regression output value being calculated below
@@ -245,8 +249,8 @@ for hiddNo = 1:length(NH)
                 
                 %UPDATE
                 
-                delMhj(j, :) = n * ((secX - output(k)) * Ph(j) * ([allPoi(i, 1) 0] - Mhj(j, :)) ./ (Sh(j) ^ 2));
-                delSh(j) = n * ((secX - output(k)) * Ph(j) * sum(([allPoi(i, 1) 0] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
+                delMhj(j, :) = n * ((secX - output(k)) * Ph(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
+                delSh(j) = n * ((secX - output(k)) * Ph(j) * sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
             end
             
             %The values of the matrix Vih are being updated below
@@ -278,11 +282,24 @@ for hiddNo = 1:length(NH)
                 
                 
                 %UPD
-                for hid_ = 1:inpN
-                    Mhj(j, :) = Mhj(j, :) + delMhj(j, :);
-                    Sh(j) = Sh(j) + delSh(j);
-                end
-                
+%                 newMhj = Mhj(j) + delMhj(j, :);
+%                 newSh = Sh(j) + delSh(j);
+%                 if (newMhj > max(xt) || newMhj < min(xt))
+%                     Mhj(j) = Mhj(j) + 0.44 * delMhj(j);
+%                    
+%                 else
+%                      Mhj(j) = newMhj;
+%                 end
+%                 
+%                 if (newSh > 3 * Sh(j))
+%                     Sh(j) = Sh(j) + delSh(j) * 0.48;
+%                 elseif newSh < 0.1 * Sh(j)
+%                     Sh(j) = Sh(j) + 2.02 * delSh(j);
+%                 else
+%                     Sh(j) = newSh;
+%                 end
+                Mhj(j) = Mhj(j) + delMhj(j, :);
+                Sh(j) = Sh(j) + delSh(j);
                 %                 Mhj(j, hid_ + 1) = Mhj(j, hid_ + 1) + delMhj(j);
                 %                 Sh(j) = Sh(j) + delSh(j);
                 
@@ -303,7 +320,7 @@ for hiddNo = 1:length(NH)
             %h(wth, :) = exp(-sum((allPoi - repmat(Mhj(wth, :), size(allPoi, 1), 1)) .^ 2) .^ .5 ./(2 * Sh(wth) ^ 2));
             
             for sth = 1:size(allPoi, 1)
-                h(wth, sth) = exp(-sum((allPoi(sth, :) - Mhj(wth, :)) .^ 2) / (2 * Sh(wth) ^ 2));
+                h(wth, sth) = exp(-sum((allPoi(sth) - Mhj(wth)) .^ 2) / (2 * Sh(wth) ^ 2));
             end
         end
         
@@ -311,7 +328,8 @@ for hiddNo = 1:length(NH)
         
         
         %Training data error being calculated for each epoch
-        err = t-y;
+
+        err = t'-y;
         
         sum_ = sum(err.^ 2) / N;
         
@@ -413,8 +431,8 @@ for hiddNo = 1:length(NH)
     hold on;
     plot(xt, rt, '+');
     hold on;
-    plot(mi(:,1)', mi(:, 2)', 'rx');
-    hold on;
+%     plot(Mhj(:,1)', Mhj(:, 2)', 'rx');
+%     hold on;
     %Hidden unit outputs multiplied by the weights on the second layer
     for hLine = 1:size(h_, 1)
         plot(x_, h_(hLine, :) * vih(hLine), '.');
