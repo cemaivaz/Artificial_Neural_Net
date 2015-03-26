@@ -204,6 +204,8 @@ for hiddNo = 1:length(NH)
     %upd
     Wih = 0.1*randn(nOut, noH + 1) - 0.05;
     
+    Wih_ = 0.1*randn(nOut, noH) - 0.05;
+    
     
     x = allPoi(:, 1)';
     %t = allPoi(:, 2)';
@@ -216,6 +218,8 @@ for hiddNo = 1:length(NH)
     errorVal = []; % Error for validation data
     
     Ph = zeros(1, Hi_);
+    
+    Gh = zeros(1, Hi_);
     
     for c = 0:1:thresh
 
@@ -235,18 +239,24 @@ for hiddNo = 1:length(NH)
                 %UPD
                 Ph(j) = exp(-sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) / (2 * sh(j) ^ 2));
                 
+               
+            end
+            
+            for u_ = 1:noH
+                Gh(u_) = Ph(u_) / sum(Ph);
             end
             %The regression output value being calculated below
             for k = 1:nOut
-                
-%                 output(k) = vih(k,1:end-1)*Ph' + vih(k,end);
-%                 %DeltaVih values being calculated below
-%                 delVih(k, :) = n * (t(k, i) - output(k));
                 
                 %UPD
                 output(k) = Wih(k,1:end-1)*Ph' + Wih(k,end);
                 %DeltaVih values being calculated below
                 delWih(k, :) = n * (secX - output(k));
+                
+                %Gh
+                output_(k) = Wih(k, 1:end-1)*Gh';
+                
+                delWih_(k, :) = n * (secX- output_(k));
             end
             %DeltaWhj values for backpropagation being calculated below
             for j = 1:noH
@@ -255,60 +265,62 @@ for hiddNo = 1:length(NH)
                 
                 %UPDATE
                 
-                delMhj(j, :) = n * 0.1 * ((secX - output(k)) * Wih(j) * Ph(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
-                delSh(j) = n * 0.1 * ((secX - output(k)) * Ph(j) * Wih(j) *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
+%                 delMhj(j, :) = n * 0.1 * ((secX - output(k)) * Wih(j) * Ph(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
+%                 Ph(j) = n * 0.1 * ((secX - output(k)) * Ph(j) * Wih(j) *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
+            
+                %Gh
+                delMhj_(j, :) = n * 0.1 * ((secX - output(k)) * (Wih_(j) - output(k)) * Gh(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
+                delSh_(j) = n * 0.1 * ((secX - output(k)) * (Wih_(j) - output(k)) * Gh(j)  *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
+            
+            
             end
             
             %The values of the matrix Vih are being updated below
             for k = 1:nOut
+
+                
+%                 %UPD
 %                 for l = 1:noH
-%                     vih(k, l) = vih(k, l) + delVih(k) * Ph(l);
+%                     Wih(k, l) = Wih(k, l) + delWih(k) * Ph(l);
 %                 end
 %                 
-%                 vih(k, l + 1) = vih(k, l + 1) + delVih(k) * 1;
+%                 Wih(k, l + 1) = Wih(k, l + 1) + delWih(k) * 1;
                 
                 
-                %UPD
                 for l = 1:noH
-                    Wih(k, l) = Wih(k, l) + delWih(k) * Ph(l);
+                    Wih_(k, l) = Wih_(k, l) + delWih_(k) * Gh(l);
                 end
-                
-                Wih(k, l + 1) = Wih(k, l + 1) + delWih(k) * 1;
                 
             end
             %The values of the matrix Whj are being updated below
             for j = 1:noH
                 
-                
-%                 for hid_ = 1:inpN
-%                     whj(j,hid_) = whj(j,hid_)+delWhj(j) .* x(hid_,i);
-%                 end
-%                 
-%                 whj(j,hid_+1) = whj(j,hid_+1)+1*delWhj(j);
-                
-                
                 %UPD
-%                 newMhj = Mhj(j) + delMhj(j, :);
-%                 newSh = Sh(j) + delSh(j);
-%                 if (newMhj > max(xt) || newMhj < min(xt))
-%                     Mhj(j) = Mhj(j) + 0.44 * delMhj(j);
-%                    
+
+%                 Mhj
+%                 tmpSh = Sh(j) + Ph(j);
+%                 theta = sum(sh) / (Hi_ * 2);
+%                 if tmpSh <= theta
+%                     Sh(j) = theta;
+%                     Sh(j) = Sh(j);
+%                 elseif tmpSh >= max(xt) - min(xt)
+%                     Sh(j) = (max(xt) - min(xt)) / (Hi_ * 0.82);
 %                 else
-%                      Mhj(j) = newMhj;
+%                     Sh(j) = tmpSh;
 %                 end
 %                 
-%                 if (newSh > 3 * Sh(j))
-%                     Sh(j) = Sh(j) + delSh(j) * 0.48;
-%                 elseif newSh < 0.1 * Sh(j)
-%                     Sh(j) = Sh(j) + 2.02 * delSh(j);
+%                 tmpMhj = Mhj(j) + delMhj(j, :);
+%                 if tmpMhj <= min(xt)
+%                     Mh(j) = min(xt) + (max(xt) - min(xt)) / (Hi_ * 2);
+%                 elseif tmpMhj >= max(xt)
+%                     Mh(j) = max(xt) - (max(xt) - min(xt)) / (Hi_ * 2);
 %                 else
-%                     Sh(j) = newSh;
+%                     Mhj(j) =tmpMhj;
 %                 end
-%                 Mhj(j) = Mhj(j) + delMhj(j, :);
-%                 Sh(j) = Sh(j) + delSh(j);
-                
+
+
                 Mhj
-                tmpSh = Sh(j) + delSh(j);
+                tmpSh = Sh(j) + Ph(j);
                 theta = sum(sh) / (Hi_ * 2);
                 if tmpSh <= theta
                     Sh(j) = theta;
@@ -328,8 +340,10 @@ for hiddNo = 1:length(NH)
                     Mhj(j) =tmpMhj;
                 end
                 
+                
+                
                 %                 Mhj(j, hid_ + 1) = Mhj(j, hid_ + 1) + delMhj(j);
-                %                 Sh(j) = Sh(j) + delSh(j);
+                %                 Sh(j) = Sh(j) + Ph(j);
                 
             end
         end
