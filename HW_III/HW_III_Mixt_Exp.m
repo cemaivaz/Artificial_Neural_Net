@@ -279,11 +279,11 @@ for hiddNo = 1:length(NH)
 %                 delSh(j) = n * 0.1 * ((secX - output(k)) * Ph(j) * Wih(j) *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
             
                 %Gh
-                delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
-                delSh_(j) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j)  *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
+%                 delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
+%                 delSh_(j) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j)  *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
                 
-                delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(j) *  firstX);
-                delSh_(j) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(j)  * firstX);
+                delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j) *  firstX);
+                delSh_(j) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j)  * firstX);
                 
                 
             end
@@ -435,6 +435,18 @@ for hiddNo = 1:length(NH)
     
     len = length(x_);
     h_ = logsig(whj * [x_; ones(1, len)]);
+    
+    
+    Gh_ = zeros(size(x_, 2), Hi_);
+    for p_ = 1:size(x_,2)
+        summ = 0;
+        for r_ = 1:Hi_
+            summ = summ + exp(-sum((x_(p_) - Mhj(r_)) .^ 2)/ (2 * Sh(r_) ^ 2));
+        end
+        for r_ = 1:Hi_
+            Gh_(p_,r_) =  exp(-sum((x_(p_) - Mhj(r_)) .^ 2)/ (2 * Sh(r_) ^ 2)) / summ; 
+        end
+    end
     
     
     
