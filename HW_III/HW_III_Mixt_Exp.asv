@@ -222,7 +222,7 @@ for hiddNo = 1:length(NH)
     
     Ph = zeros(1, Hi_);
     
-    Gh = zeros(size(xt, 1), Hi_);
+    Gh = zeros(1, Hi_);
     
     for c = 0:1:thresh
 
@@ -246,7 +246,7 @@ for hiddNo = 1:length(NH)
             end
             
             for u_ = 1:noH
-                Gh(i, u_) = Ph(u_) / sum(Ph);
+                Gh(u_) = Ph(u_) / sum(Ph);
             end
             
            
@@ -261,9 +261,9 @@ for hiddNo = 1:length(NH)
 %                 
 %                 delWih_(k, :) = n * (secX- output_(k));
                 
-                output_(k) = Gh(i, :) * wih';
+                output_(k) = Gh * wih';
                 
-                delVih(:, 1) = n * (secX- output_(k)) * Gh(i, :)' * firstX;
+                delVih(:, 1) = n * (secX- output_(k)) * Gh' * firstX;
                 delVih(:, 2) = n * (secX - output_(k));
                 
                 vih = vih + delVih;
@@ -380,8 +380,6 @@ for hiddNo = 1:length(NH)
         end
         
         y = Wih_ * [h];
-        
-        y = wih * Gh';
         
         
         %Training data error being calculated for each epoch
