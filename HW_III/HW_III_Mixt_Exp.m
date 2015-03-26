@@ -448,9 +448,9 @@ for hiddNo = 1:length(NH)
         end
     end
     
+    wih_ = vih * [x_; ones(1, size(x_, 2))];
     
-    
-    y_ = vih * [h_; ones(1,len)];
+    y_ = Gh_ * wih_;
     
     
     
