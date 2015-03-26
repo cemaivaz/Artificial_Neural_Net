@@ -1,7 +1,7 @@
 
 %Cem Rifki Aydin    2013800054
-%CmpE545    Hw 2
-%20.03.2015
+%CmpE545    Hw 3
+%27.03.2015
 
 
 close all;
@@ -11,10 +11,10 @@ clc
 format long
 
 %Hidden unit numbers are shown below
-NH = [6];
+NH = [8];
 
 %The number of epochs is shown below
-thresh = 800;
+thresh = 100;
 
 fprintf('Model is being trained..\n\n');
 
@@ -186,7 +186,11 @@ for hiddNo = 1:length(NH)
     
     %upd
     
-    sh(sh == 0) = min(sh(sh ~= 0)) / 2;
+    %sh(sh == 0) = min(sh(sh ~= 0)) / 1.88;
+    
+    %sh(sh ~= 0) = sh(sh ~= 0) * 2
+    sh(sh == 0) = (max(xt) - min(rt)) / length(xt) * 1.88;
+    %sh = sh * 12;
 
     Mhj = mi;
     Sh = sh;
@@ -204,7 +208,7 @@ for hiddNo = 1:length(NH)
     x = allPoi(:, 1)';
     %t = allPoi(:, 2)';
     
-    n = 0.19; %learning parameter
+    n = 0.112; %learning parameter
     
     
     error = []; %Error for training data
@@ -251,8 +255,8 @@ for hiddNo = 1:length(NH)
                 
                 %UPDATE
                 
-                delMhj(j, :) = n * ((secX - output(k)) * Ph(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
-                delSh(j) = n * ((secX - output(k)) * Ph(j) * sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
+                delMhj(j, :) = n * ((secX - output(k)) * Wih(j) * Ph(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
+                delSh(j) = n * ((secX - output(k)) * Ph(j) * Wih(j) *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
             end
             
             %The values of the matrix Vih are being updated below
@@ -300,24 +304,26 @@ for hiddNo = 1:length(NH)
 %                 else
 %                     Sh(j) = newSh;
 %                 end
-                %Mhj(j) = Mhj(j) + delMhj(j, :);
-                %Sh(j) = Sh(j) + delSh(j);
+%                 Mhj(j) = Mhj(j) + delMhj(j, :);
+%                 Sh(j) = Sh(j) + delSh(j);
                 
+                Mhj
                 tmpSh = Sh(j) + delSh(j);
-                theta = sum(sh) / 12;
-                if tmpSh < theta
+                theta = sum(sh) / (Hi_ * 2);
+                if tmpSh <= theta
                     Sh(j) = theta;
-                elseif tmpSh > max(xt) - min(xt)
-                    Sh(j) = (max(xt) - min(xt)) / 2;
+                    Sh(j) = Sh(j);
+                elseif tmpSh >= max(xt) - min(xt)
+                    Sh(j) = (max(xt) - min(xt)) / (Hi_ * 0.82);
                 else
                     Sh(j) = tmpSh;
                 end
                 
                 tmpMhj = Mhj(j) + delMhj(j, :);
-                if tmpMhj < min(xt)
-                    Mh(j) = min(xt) + (max(xt) - min(xt)) / Hi_;
-                elseif tmpMhj > max(xt)
-                    Sh(j) = max(xt) - (max(xt) - min(xt)) / Hi_;
+                if tmpMhj <= min(xt)
+                    Mh(j) = min(xt) + (max(xt) - min(xt)) / (Hi_ * 2);
+                elseif tmpMhj >= max(xt)
+                    Mh(j) = max(xt) - (max(xt) - min(xt)) / (Hi_ * 2);
                 else
                     Mhj(j) =tmpMhj;
                 end
@@ -359,18 +365,33 @@ for hiddNo = 1:length(NH)
         
         
         %Validation
-        hVal = logsig(whj * [xVal; ones(1, N)]);
+
         
-        yVal = vih * [hVal; ones(1, N)];
+        %Upd
+        hVal = zeros(length(Sh), size(x, 2));
         
-        %Validation data error being calculated
-        err = tVal-yVal;
+        for wth = 1:length(Sh)
+            %h(wth, :) = exp(-sum((allPoi - repmat(Mhj(wth, :), size(allPoi, 1), 1)) .^ 2) .^ .5 ./(2 * Sh(wth) ^ 2));
+            
+            for sth = 1:length(xVal)
+                h(wth, sth) = exp(-sum((xVal(sth) - Mhj(wth)) .^ 2) / (2 * Sh(wth) ^ 2));
+            end
+        end
         
-        sum_ =  sum(err.^ 2) / N;
+        yVal_ = Wih * [h; ones(1, N)];
+        
+        
+        %Training data error being calculated for each epoch
+
+        
+        err = tVal - yVal_;
+        
+        sum_ = sum(err.^ 2) / N;
         
         errorVal = [errorVal sum_];
         
-        n = n * 0.44;
+        %%%
+        n = n * 0.73;
     end
     
     %Training error
