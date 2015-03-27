@@ -282,10 +282,10 @@ for hiddNo = 1:length(NH)
 %                 delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
 %                 delSh_(j) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j)  *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
                 
-                delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j) *  firstX);
-                delSh_(j) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j)  * firstX);
+                delMhj_(j, :) = n * 0.07 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j) *  firstX);
+                delSh_(j) = n * 0.07 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j)  * firstX);
                 
-                
+                %delSh_(j) = 0;
             end
             
             %The values of the matrix Vih are being updated below
@@ -293,7 +293,7 @@ for hiddNo = 1:length(NH)
 
                 
 %                 %UPD
-%                 for l = 1:noH
+%                 for l = 1:noH 
 %                     Wih(k, l) = Wih(k, l) + delWih(k) * Ph(l);
 %                 end
 %                 
@@ -441,11 +441,16 @@ for hiddNo = 1:length(NH)
     for p_ = 1:size(x_,2)
         summ = 0;
         for r_ = 1:Hi_
-            summ = summ + exp(-(x_(p_) - Mhj(r_))/ (2 * s));
+            summ = summ + exp(-sum((x_(p_) - Mhj(r_)) .^ 2)/ (2 * Sh(r_) ^ 2));
         end
-        Gh_(p_,r_) = ;
+        for r_ = 1:Hi_
+            Gh_(p_,r_) =  exp(-sum((x_(p_) - Mhj(r_)) .^ 2)/ (2 * Sh(r_) ^ 2)) / summ; 
+        end
     end
-    y_ = vih * [h_; ones(1,len)];
+    
+    wih_ = vih * [x_; ones(1, size(x_, 2))];
+    
+    y_ = Gh_ * wih_;
     
     
     

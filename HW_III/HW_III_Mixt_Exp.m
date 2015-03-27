@@ -282,10 +282,10 @@ for hiddNo = 1:length(NH)
 %                 delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
 %                 delSh_(j) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j)  *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
                 
-                delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j) *  firstX);
-                delSh_(j) = n * 0.1 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j)  * firstX);
+                delMhj_(j, :) = n * 0.07 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j) *  firstX);
+                delSh_(j) = n * 0.07 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j)  * firstX);
                 
-                
+                %delSh_(j) = 0;
             end
             
             %The values of the matrix Vih are being updated below
@@ -293,7 +293,7 @@ for hiddNo = 1:length(NH)
 
                 
 %                 %UPD
-%                 for l = 1:noH
+%                 for l = 1:noH 
 %                     Wih(k, l) = Wih(k, l) + delWih(k) * Ph(l);
 %                 end
 %                 
@@ -479,7 +479,7 @@ for hiddNo = 1:length(NH)
         end
     end
     
-    y_ = Wih_ * h;
+    %y_ = Wih_ * h;
     
     %Underlying function getting drawn through the below code
     plot(x_, y_, '-');
