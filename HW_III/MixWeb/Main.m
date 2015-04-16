@@ -79,7 +79,7 @@ figure();
 % tx2 = (-0.5:0.05:0.5); vx2 = (-0.5:0.05:0.5);
 % tr2 = sin(6 * tx2);
 % vr2 = sin(6 * vx2);
-[v, m, s] = TrainMixtureOfExperts('regression', 'cooperative', tx2, tr2, 3, 100, 0.5, 0.99);
+[v, m, s] = TrainMixtureOfExperts('regression', 'cooperative', tx2, tr2, 3, 1000, 0.8, 0.99);
 [err, cr] = TestMixtureOfExperts('regression', vx2, vr2, v, m, s);
 m
 plot(vx2, cr, 'xr')
