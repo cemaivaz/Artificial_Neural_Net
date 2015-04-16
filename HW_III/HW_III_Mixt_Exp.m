@@ -116,6 +116,7 @@ for hiddNo = 1:length(NH)
     cnt = 0;
     thr = 100;
     t = [];
+    
     while cnt < thr
         
         cnt = cnt + 1;
@@ -196,9 +197,6 @@ for hiddNo = 1:length(NH)
     Sh = sh;
     
     
-   
-    
-    %vih = 0.02*randn(nOut,noH+1) - 0.01;
     
     vih = 0.02*randn(noH,inpN + 1) - 0.01;
     
@@ -256,10 +254,6 @@ for hiddNo = 1:length(NH)
             %The regression output value being calculated below
             for k = 1:nOut
              
-                %Gh
-%                 output_(k) = sum(vih * [firstX; 1]);Wih_(k, 1:end)*Gh';
-%                 
-%                 delWih_(k, :) = n * (secX- output_(k));
                 
                 output_(k) = Gh(i, :) * wih';
                 
@@ -271,104 +265,29 @@ for hiddNo = 1:length(NH)
             %DeltaWhj values for backpropagation being calculated below
             for j = 1:noH
                 
-%                 delWhj(j) =  n * (t(i) - output(k)) * vih(j) * Ph(j) * (1 - Ph(j));
-                
-                %UPDATE
-                
-%                 delMhj(j, :) = n * 0.1 * ((secX - output(k)) * Wih(j) * Ph(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
-%                 delSh(j) = n * 0.1 * ((secX - output(k)) * Ph(j) * Wih(j) *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
-            
-                %Gh
-%                 delMhj_(j, :) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j) * ([allPoi(i, 1)] - Mhj(j)) ./ (Sh(j) ^ 2));
-%                 delSh_(j) = n * 0.1 * ((secX - output_(k)) * (Wih_(j) - output_(k)) * Gh(j)  *sum(([allPoi(i, 1)] - Mhj(j, :)) .^ 2) ./ (Sh(j) ^ 3));
                 
                 delMhj_(j, :) = n * 0.07 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j) *  firstX);
                 delSh_(j) = n * 0.07 * ((secX - output_(k)) * (wih(j) - output_(k)) * Gh(i, j)  * firstX);
                 
-                %delSh_(j) = 0;
+                delSh_(j) = 0;
             end
             
-            %The values of the matrix Vih are being updated below
-            for k = 1:nOut
 
-                
-%                 %UPD
-%                 for l = 1:noH 
-%                     Wih(k, l) = Wih(k, l) + delWih(k) * Ph(l);
-%                 end
-%                 
-%                 Wih(k, l + 1) = Wih(k, l + 1) + delWih(k) * 1;
-                
-                
-%                 for l = 1:noH
-%                     Wih_(k, l) = Wih_(k, l) + delWih_(k) * Gh(l);
-%                 end
-                
-            end
-            %The values of the matrix Whj are being updated below
             for j = 1:noH
                 
-                %UPD
-
-%                 Mhj
-%                 tmpSh = Sh(j) + delSh(j);
-%                 theta = sum(sh) / (Hi_ * 2);
-%                 if tmpSh <= theta
-%                     Sh(j) = theta;
-%                     Sh(j) = Sh(j);
-%                 elseif tmpSh >= max(xt) - min(xt)
-%                     Sh(j) = (max(xt) - min(xt)) / (Hi_ * 0.82);
-%                 else
-%                     Sh(j) = tmpSh;
-%                 end
-%                 
-%                 tmpMhj = Mhj(j) + delMhj(j, :);
-%                 if tmpMhj <= min(xt)
-%                     Mh(j) = min(xt) + (max(xt) - min(xt)) / (Hi_ * 2);
-%                 elseif tmpMhj >= max(xt)
-%                     Mh(j) = max(xt) - (max(xt) - min(xt)) / (Hi_ * 2);
-%                 else
-%                     Mhj(j) =tmpMhj;
-%                 end
-
-
-                Mhj
-                tmpSh = Sh(j) + delSh_(j);
-                theta = sum(sh) / (Hi_ * 2);
-                if tmpSh <= theta
-                    Sh(j) = theta;
-                    Sh(j) = Sh(j);
-                elseif tmpSh >= max(xt) - min(xt)
-                    Sh(j) = (max(xt) - min(xt)) / (Hi_ * 0.82);
-                else
-                    Sh(j) = tmpSh;
-                end
-                
+              
                 tmpMhj = Mhj(j) + delMhj_(j, :);
                 if tmpMhj <= min(xt)
-                    Mh(j) = min(xt) + (max(xt) - min(xt)) / (Hi_ * 2);
+                    Mhj(j) = min(xt) + (max(xt) - min(xt)) / (Hi_ * 2);
                 elseif tmpMhj >= max(xt)
-                    Mh(j) = max(xt) - (max(xt) - min(xt)) / (Hi_ * 2);
+                    Mhj(j) = max(xt) - (max(xt) - min(xt)) / (Hi_ * 2);
                 else
                     Mhj(j) =tmpMhj;
                 end
                 
-                
-                
-                %                 Mhj(j, hid_ + 1) = Mhj(j, hid_ + 1) + delMhj(j);
-                %                 Sh(j) = Sh(j) + delSh(j);
-                
             end
         end
         
-        
-        %Training
-%         h = logsig(whj * [x; ones(1, N)]);
-%         
-%         y = vih * [h; ones(1, N)];
-        
-        
-        %UPD
         h = zeros(length(Sh), size(x, 2));
         
         for wth = 1:length(Sh)
@@ -382,6 +301,10 @@ for hiddNo = 1:length(NH)
         y = Wih_ * [h];
         
         y = wih * Gh';
+        
+        
+        
+        
         
         
         %Training data error being calculated for each epoch
@@ -450,21 +373,7 @@ for hiddNo = 1:length(NH)
     
     wih_ = vih * [x_; ones(1, size(x_, 2))];
     
-    y_ = Gh_ * wih_;
-    
-    
-    
-%     h = zeros(length(Sh), size(x, 2));
-%     
-%     for wth = 1:length(Sh)
-%         %h(wth, :) = exp(-sum((allPoi - repmat(Mhj(wth, :), size(allPoi, 1), 1)) .^ 2) .^ .5 ./(2 * Sh(wth) ^ 2));
-%         
-%         for sth = 1:size(allPoi, 1)
-%             h(wth, sth) = exp(-sum((allPoi(sth, :) - Mhj(wth, :)) .^ 2) / (2 * Sh(wth) ^ 2));
-%         end
-%     end
-%     
-%     y = Wih * [h; ones(1, N)];
+    y_ = sum(Gh_ .* wih_', 2);
     
     
     %UPD
@@ -487,11 +396,7 @@ for hiddNo = 1:length(NH)
     %Data are shown through the symbol '+' on the plot
     plot(xt, rt, '+');
     hold on;
-    %The hyperplanes of the hidden unit weights on the first layer
-    for hLine = 1:size(whj, 1)
-        plot(x_, whj(hLine, :) * [x_; ones(1, len)], '.');
-        hold on;
-    end
+
     str = strcat(int2str(noH), ' hidden units');
     title(str);
     hold off;
@@ -502,11 +407,7 @@ for hiddNo = 1:length(NH)
     hold on;
     plot(xt, rt, '+');
     hold on;
-    %Hidden unit outputs
-    for hLine = 1:size(h_, 1)
-        plot(x_, h_(hLine, :), '.');
-        hold on;
-    end
+
     title(str);
     hold off;
     figure();
@@ -515,13 +416,7 @@ for hiddNo = 1:length(NH)
     hold on;
     plot(xt, rt, '+');
     hold on;
-%     plot(Mhj(:,1)', Mhj(:, 2)', 'rx');
-%     hold on;
-    %Hidden unit outputs multiplied by the weights on the second layer
-    for hLine = 1:size(h_, 1)
-        plot(x_, h_(hLine, :) * vih(hLine), '.');
-        hold on;
-    end
+
     title(str);
     hold off;
     figure();
