@@ -117,7 +117,7 @@ for i_ = 1:size(x_, 1)
     % calculate output
     
     
-    g_ = [g_ g];
+    g_ = [g_; g];
     
     % output for each output dimension
     yi = (w*g')';
@@ -148,6 +148,8 @@ plot(x_(:, 2)', yi_, '-');
 hold on;
 plot(tx(:, 2), tr, '+');
 hold on;
-plot(x_(:, 2)', g_, 'r-');
+for i_ = 1:expertCount
+    plot(x_(:, 2)', g_(:, i_), '- ');
+end
 
 end
