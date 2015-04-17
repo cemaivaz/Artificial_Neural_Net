@@ -82,4 +82,4 @@ for i_ = 1:length(NH)
     
 end
 
-fprintf('\nValidation error: %.2f\n', err);
+fprintf('\nValidation error: %.26f\n', err);
