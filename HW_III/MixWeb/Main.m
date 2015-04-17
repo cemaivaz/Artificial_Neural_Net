@@ -6,7 +6,7 @@ clc
 
 format long
 
-%Hidden unit numbers are shown below
+%Expert numbers are shown below
 NH = [2; 3; 5];
 
 %The number of epochs is shown below

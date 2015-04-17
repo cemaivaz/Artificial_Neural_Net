@@ -1,13 +1,13 @@
-function [v, m, s] = trainMOE( tx, tr, exp_, iterLim, learnParam, decaying)
+function [v, mh, s] = trainMOE( dataX, dataR, exp_, iterLim, learnParam, decaying)
 
 
-sampleCount = size(tx,1);
-dim = size(tx,2) + 1;
-outputCount = size(tr, 2);
+dataSize = size(dataX,1);
+dimen = size(dataX,2) + 1;
+dimenOut = size(dataR, 2);
 
 
 % add bias unit to x
-tx = [ones(sampleCount,1) tx];
+dataX = [ones(dataSize,1) dataX];
 
 
 
@@ -15,56 +15,56 @@ tx = [ones(sampleCount,1) tx];
 % decaying = 0.98;
 
 % initialize parameters
-% use first points for m
-% m = tx(1:exp_,:);
-m = (rand(exp_, dim)*0.02)-0.01;
+% use first points for mh
+% mh = dataX(1:exp_,:);
+mh = (rand(exp_, dimen)*0.02)-0.01;
 % v in {-0.01, 0.01}
-v = (rand(exp_,dim, outputCount)*0.02)-0.01;
+v = (rand(exp_,dimen, dimenOut)*0.02)-0.01;
 
 
-[m, s] = kmeans(exp_);
-% % m = [repmat(size())];
-%m = [repmat(1, size(m, 1), 1) m];
+[mh, s] = kmeans(exp_);
+% % mh = [repmat(size())];
+%mh = [repmat(1, size(mh, 1), 1) mh];
 
-m = [rand(exp_, dim - 1) * 0.02 - 0.01 m]
-%m = [rand(exp_, 1) * 0.02 - 0.01 m];
-iters = 1;
+mh = [rand(exp_, dimen - 1) * 0.02 - 0.01 mh]
+%mh = [rand(exp_, 1) * 0.02 - 0.01 mh];
+iter_ = 1;
 errs = zeros(iterLim, 1);
 prevErr = Inf;
 while 1
     % choose next training instance randomly
-    trSeq = randperm(sampleCount);
-    for i=1:sampleCount
-        k = trSeq(i);
-        xt = tx(k,:);
-        rt = tr(k,:);
+    rand_ = randperm(dataSize);
+    for i=1:dataSize
+        k = rand_(i);
+        xt = dataX(k,:);
+        rt = dataR(k,:);
         
        
         % calculate intermediate values
-        g = (exp(m*xt'))';
+        gh = (exp(mh*xt'))';
         
-        g = g ./ sum(g);
-        w = zeros(outputCount, exp_);
-        for j=1:outputCount
+        gh = gh ./ sum(gh);
+        w = zeros(dimenOut, exp_);
+        for j=1:dimenOut
             w(j,:) = (v(:,:,j)*xt')';
         end     
         
         % calculate output
         
         % output for each output dimension
-        yi = (w*g')';
-        % calculate delta v and m for each output unit
+        yi = (w*gh')';
+        % calculate delta v and mh for each output unit
         for r=1:exp_
-            for j=1:outputCount
-                dv = learnParam .* ( rt(1,j) - yi(1,j)) * g(1, r) * xt;
+            for j=1:dimenOut
+                deltaV = learnParam .* ( rt(1,j) - yi(1,j)) * gh(1, r) * xt;
 
-                v(r, :, j) = v(r, :, j) + dv;
+                v(r, :, j) = v(r, :, j) + deltaV;
                 
             end
-            % calculate delta m
-            dm = learnParam .* sum((rt - yi) .* (w(:, r)' - yi)) .* g(1, r) * xt;
+            % calculate delta mh
+            deltaM = learnParam .* sum((rt - yi) .* (w(:, r)' - yi)) .* gh(1, r) * xt;
 
-            m( r, : ) = m( r, : ) + dm;
+            mh( r, : ) = mh( r, : ) + deltaM;
             
         end        
     end
@@ -72,18 +72,18 @@ while 1
     learnParam = learnParam * decaying;
     % calculate training set error
 
-    err = TestMixtureOfExperts( tx(:,2:dim), tr, v, m, s);
+    err = TestMixtureOfExperts( dataX(:,2:dimen), dataR, v, mh, s);
     fprintf('Error: %f\n', err);
-    errs(iters, 1) = err;
+    errs(iter_, 1) = err;
     
-    iters = iters + 1;    
+    iter_ = iter_ + 1;    
     % check stop condition
-    if iters > iterLim 
-        fprintf('Max Iterations Reached\n');
+    if iter_ > iterLim 
+        
         break;
     end
     if err < 0.00001
-        fprintf('Error reached minimum\n');
+       
         break;
     end
 %     if abs(prevErr - err) < 0.0001
@@ -92,7 +92,7 @@ while 1
 %     prevErr = err;
 end
 
-x_ = min(tx(:, 2)):0.01:max(tx(:, 2));
+x_ = min(dataX(:, 2)):0.01:max(dataX(:, 2));
 x_ = x_';
 
 x_ = [ones(size(x_, 1),1) x_];
@@ -103,12 +103,12 @@ for i_ = 1:size(x_, 1)
     
     xt = x_(i_, :);
     % calculate intermediate values
-    g = (exp(m*xt'))';
+    gh = (exp(mh*xt'))';
     
-    g = g ./ sum(g);
-    w = zeros(outputCount, exp_);
+    gh = gh ./ sum(gh);
+    w = ones(dimenOut, exp_);
     
-    for j=1:outputCount
+    for j=1:dimenOut
         w(j,:) = (v(:,:,j)*xt')';
         
     end
@@ -117,10 +117,10 @@ for i_ = 1:size(x_, 1)
     % calculate output
     
     
-    g_ = [g_; g];
+    g_ = [g_; gh];
     
     % output for each output dimension
-    yi = (w*g')';
+    yi = (w*gh')';
     yi_ = [yi_ yi];
     
 end
@@ -129,13 +129,13 @@ size(w_)
 figure()
 plot(x_(:, 2)', yi_, '-');
 hold on;
-plot(tx(:, 2), tr, '+');
+plot(dataX(:, 2), dataR, '+');
 
 
 figure()
 plot(x_(:, 2)', yi_, '-');
 hold on;
-plot(tx(:, 2), tr, '+');
+plot(dataX(:, 2), dataR, '+');
 hold on;
 for i_ = 1:exp_
     plot(x_(:, 2)', w_(:, i_), '- ');
@@ -146,7 +146,7 @@ size(g_)
 figure()
 plot(x_(:, 2)', yi_, '-');
 hold on;
-plot(tx(:, 2), tr, '+');
+plot(dataX(:, 2), dataR, '+');
 hold on;
 for i_ = 1:exp_
     plot(x_(:, 2)', g_(:, i_), '- ');
