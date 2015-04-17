@@ -7,7 +7,7 @@ clc
 format long
 
 %Hidden unit numbers are shown below
-NH = [1; 2; 3];
+NH = [2; 3; 5];
 
 %The number of epochs is shown below
 thresh = 800;
@@ -76,11 +76,8 @@ vr2 = rtVal(randOrd);
 
 
 for i_ = 1:length(NH)
-    [v, m, s] = TrainMixtureOfExperts('regression', 'cooperative', tx2, tr2, NH(i_), 1000, 0.85, 0.99);
-    [err, cr] = TestMixtureOfExperts('regression', vx2, vr2, v, m, s);
+    [v, m, s] = trainMOE(tx2, tr2, NH(i_), 1000, 0.85, 0.99);
+    [err, cr] = TestMixtureOfExperts(vx2, vr2, v, m, s);
 
-%     plot(vx2, cr, 'xr')
-%     hold on
-%     plot(vx2, vr2, 'ob')
     
 end

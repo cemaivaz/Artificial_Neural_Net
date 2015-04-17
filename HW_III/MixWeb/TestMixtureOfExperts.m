@@ -1,4 +1,4 @@
-function [err, r] = TestMixtureOfExperts(problemType, vx, vr, v, m, s)
+function [err, r] = TestMixtureOfExperts(vx, vr, v, m, s)
 
 outputCount = size(vr, 2);
 expertCount = size(m,1);
