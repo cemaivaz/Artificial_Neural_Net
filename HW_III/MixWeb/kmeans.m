@@ -2,8 +2,6 @@ function [Mhj, Sh] = kmeans(hiddNo)
 
 format long
 
-%Hidden unit numbers are shown below
-NH = [2; 4; 8];
 
 %The number of epochs is shown below
 thresh = 100;
@@ -75,7 +73,6 @@ tVal = rtVal(randOrd)';
 
 
 
-errorAll = zeros(2, length(NH));
 %%%
 
 noH = hiddNo;

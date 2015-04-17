@@ -1,12 +1,13 @@
 
 
 clear all;
+close all;
 clc
 
 format long
 
 %Hidden unit numbers are shown below
-NH = [2; 4; 8];
+NH = [1; 2; 3];
 
 %The number of epochs is shown below
 thresh = 800;
@@ -73,15 +74,13 @@ rtVal = tmprtVal;
 vx2 = xtVal(randOrd);
 vr2 = rtVal(randOrd);
 
-No = 25;
-figure();
 
-% tx2 = (-0.5:0.05:0.5); vx2 = (-0.5:0.05:0.5);
-% tr2 = sin(6 * tx2);
-% vr2 = sin(6 * vx2);
-[v, m, s] = TrainMixtureOfExperts('regression', 'cooperative', tx2, tr2, 3, 1000, 0.8, 0.99);
-[err, cr] = TestMixtureOfExperts('regression', vx2, vr2, v, m, s);
-m
-plot(vx2, cr, 'xr')
-hold on
-plot(vx2, vr2, 'ob')
+for i_ = 1:length(NH)
+    [v, m, s] = TrainMixtureOfExperts('regression', 'cooperative', tx2, tr2, NH(i_), 1000, 0.85, 0.99);
+    [err, cr] = TestMixtureOfExperts('regression', vx2, vr2, v, m, s);
+
+%     plot(vx2, cr, 'xr')
+%     hold on
+%     plot(vx2, vr2, 'ob')
+    
+end
