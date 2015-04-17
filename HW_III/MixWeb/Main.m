@@ -77,7 +77,9 @@ vr2 = rtVal(randOrd);
 
 for i_ = 1:length(NH)
     [v, m, s] = trainMOE(tx2, tr2, NH(i_), 1000, 0.85, 0.99);
-    [err, cr] = TestMixtureOfExperts(vx2, vr2, v, m, s);
+    [err, cr] = testMOE(vx2, vr2, v, m, s);
 
     
 end
+
+fprintf('\nValidation error: %.2f\n', err);

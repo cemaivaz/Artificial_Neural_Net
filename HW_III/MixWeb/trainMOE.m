@@ -72,8 +72,8 @@ while 1
     learnParam = learnParam * decaying;
     % calculate training set error
 
-    err = TestMixtureOfExperts( dataX(:,2:dimen), dataR, v, mh, s);
-    fprintf('Error: %f\n', err);
+    err = testMOE( dataX(:,2:dimen), dataR, v, mh, s);
+    fprintf('Err: %f\n', err);
     errs(iter_, 1) = err;
     
     iter_ = iter_ + 1;    
