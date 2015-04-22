@@ -62,12 +62,15 @@ end
 
 
 if file_ == 1
-    movementLabels_ =  dlmread('output.txt', ',', [0 0 7085 0]);
-    valsAll_ = dlmread('output.txt', ',', [0 1 7085 1699]);;
+    size_ = dlmread('output.txt');
+    movementLabels_ =  dlmread('output.txt', ',', [0 0 size(size_, 1) - 1 0]);
+    valsAll_ = dlmread('output.txt', ',', [0 1 size(size_, 1) - 1 size(size_, 2) - 1]);;
     
 else
-    movementLabels_ =  dlmread('output2.txt', ',', [0 0 39 0]);
-    valsAll_ = dlmread('output2.txt', ',', [0 1 39 1699]);;
+    size_ = dlmread('output2.txt');
+    size(size_)
+    movementLabels_ =  dlmread('output2.txt', ',', [0 0 size(size_, 1) - 1 0]);
+    valsAll_ = dlmread('output2.txt', ',', [0 1 size(size_, 1) - 1 size(size_, 2) - 1]);;
     
 end
 

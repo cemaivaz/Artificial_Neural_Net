@@ -13,6 +13,8 @@ close all
 make 
 mex -setup
 
+file_ = 2;
+
 %We scan the files in the 'movements' folder
 subDir = dir('movements');
 
@@ -59,11 +61,18 @@ for direc = find(ind)
 end
 
 
-% movementLabels_ =  dlmread('output.txt', ',', [0 0 7085 0]);
-% valsAll_ = dlmread('output.txt', ',', [0 1 7085 1699]);;
+if file_ == 1
+    size_ = dlmread('output.txt');
+    movementLabels_ =  dlmread('output.txt', ',', [0 0 size(size_, 1) - 1 0]);
+    valsAll_ = dlmread('output.txt', ',', [0 1 7085 1699]);;
+    
+else
+    size_ = dlmread('output2.txt');
+    movementLabels_ =  dlmread('output2.txt', ',', [0 0 size(size_, 1) - 1 0]);
+    valsAll_ = dlmread('output2.txt', ',', [0 1 size(size_, 1) size(size_, 2) - 1]);;
+    
+end
 
-movementLabels_ =  dlmread('output.txt', ',', [0 0 39 0]);
-valsAll_ = dlmread('output.txt', ',', [0 1 39 1699]);;
 
  movementLabels = [];
  valsAll = [];
@@ -123,16 +132,18 @@ for j = 1:cv_.NumTestSets
     train_data = cell2mat(mod_);
     train_label = str2double(labelsTr_);
     
+    %The below built-in function provided by the libsvm library trains
+    %a model through the data collected by the application "Accelerometere Monitor".
+    model_linear = svmtrain(labelsTr_, train_data, '-t 2')
+    
+    
     for w = 1:length(test_)
         
         test_label = labelsTest_(testIter);
         test_data = test_{w};
         
         testIter = testIter + 1;
-        %The below built-in function provided by the libsvm library trains
-        %a model through the data collected by the application "Accelerometere Monitor".
-        model_linear = svmtrain(labelsTr_, train_data, '-t 2')
-        
+       
         %The below built-in function detects the labels, and accuracy
         %percentage, where the test data and labels to be classified are inputs.
         [predict_label_L, accuracy_L, dec_values_L] = svmpredict(test_label, test_data, model_linear);
