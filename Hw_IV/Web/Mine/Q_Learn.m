@@ -46,6 +46,8 @@ for ei = 1:episodeCount,
     curpos = start;
     nextpos = start;
     
+ 
+    
     %epsilon or greedy
     if(rand > epsilon) % greedy
         [qmax, a] = max(Q(curpos.row,curpos.col,:));
@@ -53,6 +55,7 @@ for ei = 1:episodeCount,
         a = IntRand(1, actionCount);
     end
 
+    
     episodeFinished = 0;
     while(episodeFinished == 0)
         % take action a, observe r, and nextpos
@@ -78,10 +81,16 @@ for ei = 1:episodeCount,
         nextQ = qmax; %Q(nextpos.row, nextpos.col, a_next);
         %Q(curpos.row, curpos.col, a) = curQ + alpha*(r + gamma*nextQ - curQ);
         
+        
+        tmpPos = GiveNextPos(curpos, a_next, gridcols, gridrows);
+        [orthogSt1, orthogSt2] = ProbPos(curpos, tmpPos, gridrows);
     
+        orthogVal1 = max(Q(orthogSt1.row,orthogSt1.col,:));
+        orthogVal2 = max(Q(orthogSt2.row,orthogSt2.col,:));
+        
         Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
-        Q(curpos.row, curpos.col, a) = .25 * (curQ + alpha*(r + gamma*nextQ - curQ));
-        Q(curpos.row, curpos.col, a) = .25 * (curQ + alpha*(r + gamma*nextQ - curQ));
+        Q(curpos.row, curpos.col, a) = .25 * (curQ + alpha*(r + gamma*orthogVal1 - curQ));
+        Q(curpos.row, curpos.col, a) = .25 * (curQ + alpha*(r + gamma*orthogVal2 - curQ));
         
         
         curpos = nextpos; a = a_next;
