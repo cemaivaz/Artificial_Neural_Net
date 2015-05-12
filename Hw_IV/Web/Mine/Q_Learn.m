@@ -12,8 +12,8 @@
 gamma = 0.9;
 alpha = 0.05;
 epsilon = 0.1;
-gridcols = 10;
-gridrows = 7;
+gridcols = 8;
+gridrows = 8;
 fontsize = 16;
 showTitle = 1;
 
@@ -22,10 +22,10 @@ selectedEpisodes = [20 200 700 1000 2000];
 isKing = 0;
 canHold = 0;
 
-start.row = 7;
+start.row = 1;
 start.col = 1;
 goal.row = 7;
-goal.col = 10;
+goal.col = 6;
 
 
 selectedEpIndex = 1;
