@@ -1,4 +1,7 @@
+%Cem Rýfký Aydýn 2013800054
+%CmpE545 - Homework III
 
+%Mixture of Experts
 
 clear all;
 close all;
@@ -77,9 +80,8 @@ vr2 = rtVal(randOrd);
 
 for i_ = 1:length(NH)
     [v, m, s] = trainMOE(tx2, tr2, NH(i_), 1000, 0.85, 0.99);
-    [err, cr] = testMOE(vx2, vr2, v, m, s);
+    err = testMOE(vx2, vr2, v, m, s);
 
     
+    fprintf('\nValidation error: %.26f\n', err);
 end
-
-fprintf('\nValidation error: %.26f\n', err);

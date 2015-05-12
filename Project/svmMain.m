@@ -1,9 +1,7 @@
-%"WEARABLE COMPUTING" PROJECT - Team 11, 13/12/2014
-%DEVELOPING EXOSKELETON SYSTEM FOR THE MOBILITY-IMPAIRED
-%Ali Ozcan, Bugra Oral, Erdem Emekligil, Onur Satici, Cem Rifki Aydin
+%Cem Rýfký Aydýn    2013800054
 
-%PART 3 - Implementation of SVM (radial basis)
 
+%Implementation of SVM (radial basis)
 %Below is the source code written for the exoskeleton system - recognition of different
 %arm movements.
 
@@ -16,49 +14,7 @@ mex -setup
 file_ = 1;
 
 %We scan the files in the 'movements' folder
-subDir = dir('movements');
 
-subDirInd = [subDir.isdir];
-
-subDir_ = {subDir(subDirInd).name};
-ind = ~ismember(subDir_, {'.', '..'});
-
-
-testDataAll = [];
-movementLabels = [];
-
-
-valsAll = [];
-
-%All the files in the subdirectories of the folder 'movements' are scanned
-for direc = find(ind)
-    newDir = fullfile('movements', subDir_{direc});
-    allFiles = dir(newDir);
-    
-    x = newDir;
-    fileN = {};
-    for file = allFiles';
-        
-        if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
-            fileN = [fileN; char(strcat(strcat('movements\', strcat(subDir_{direc}, '\')), char(file.name)))];
-        end
-        
-    end
-    
-    allData = cellstr(fileN);
-    
-    for u = 1:length(allData)
-        
-        
-        fileMv = allData(u);
-        fileMv = char(fileMv);
-        
-        vals_ = dlmread(fileMv, ' ', 0, 0);
-        valsAll = [valsAll; {vals_}];
-        
-        movementLabels = [movementLabels; {subDir_{direc}}];
-    end
-end
 
 
 if file_ == 1
@@ -75,10 +31,10 @@ else
 end
 
 
- movementLabels = [];
+ sentLabels = [];
  valsAll = [];
 for i = 1:size(movementLabels_, 1)
-    movementLabels = [movementLabels;  (movementLabels_(i, :))];
+    sentLabels = [sentLabels;  (movementLabels_(i, :))];
 end
 for i = 1:size(valsAll_, 1)
     valsAll = [valsAll; {valsAll_(i, :)}];
@@ -87,23 +43,23 @@ end
 fprintf('_____')
 
 %Unique movement labels are determined
-order = unique(movementLabels);
-coef = length(movementLabels) / length(order);
-length(movementLabels);
+order = unique(sentLabels);
+coef = length(sentLabels) / length(order);
+length(sentLabels);
 
 foldNo = 5;
 %The below built-in function helps us leverage the cross-validation method,
 %where the "k" (fold) value in this case is 10
-cv_ = cvpartition(movementLabels, 'k', foldNo);
+cv_ = cvpartition(sentLabels, 'k', foldNo);
 
 
 
-cnterAll = length(movementLabels);
+cnterAll = length(sentLabels);
 cnterSucc = 0;
 
 avgSucc = 0;
 
-orderInt = 1:length(unique(movementLabels));
+orderInt = 1:length(unique(sentLabels));
 
 avgSucc = 0;
 
@@ -126,8 +82,8 @@ for j = 1:cv_.NumTestSets
     
     test_ = valsAll(trDat == 0);
     
-    labelsTr_ = movementLabels((trDat == 1)', :);
-    labelsTest_ = movementLabels((trDat == 0)', :);
+    labelsTr_ = sentLabels((trDat == 1)', :);
+    labelsTest_ = sentLabels((trDat == 0)', :);
     
     
     train_data = cell2mat(mod_);
@@ -154,10 +110,10 @@ for j = 1:cv_.NumTestSets
         
         if accuracy_L(1) ~= 100
             cntTestFail = cntTestFail + 1;
-            RESULTS{resind} = ['FALSE - Test movement: ', int2str(test_label), ', Predicted movement: ', int2str(mod((test_label + 1), 2))];
+            RESULTS{resind} = ['FALSE - Sentiment: ', int2str(test_label), ', Predicted sentiment: ', int2str(mod((test_label + 1), 2))];
         else
             cntTestSucc = cntTestSucc + 1;
-            RESULTS{resind} = ['TRUE - Test movement: ',int2str(test_label), ', Predicted movement: ', int2str(test_label)];
+            RESULTS{resind} = ['TRUE - Sentiment: ',int2str(test_label), ', Predicted sentiment: ', int2str(test_label)];
         end
         
         resind = resind + 1;

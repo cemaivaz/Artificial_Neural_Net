@@ -1,6 +1,4 @@
-%"WEARABLE COMPUTING" PROJECT - Team 11, 13/12/2014
-%DEVELOPING EXOSKELETON SYSTEM FOR THE MOBILITY-IMPAIRED
-%Ali Ozcan, Bugra Oral, Erdem Emekligil, Onur Satici, Cem Rifki Aydin
+%Cem Rýfký Aydýn    2013800054
 
 %PART 3 - Implementation of SVM (radial basis)
 
@@ -21,7 +19,7 @@ ind = ~ismember(subDir_, {'.', '..'});
 
 
 testDataAll = [];
-movementLabels = [];
+sentLabels = [];
 
 
 valsAll = [];
@@ -52,7 +50,7 @@ for direc = find(ind)
         vals_ = dlmread(fileMv, ' ', 0, 0);
         valsAll = [valsAll; {vals_}];
         
-        movementLabels = [movementLabels; {subDir_{direc}}];
+        sentLabels = [sentLabels; {subDir_{direc}}];
     end
 end
 
@@ -60,23 +58,23 @@ end
 
 
 %Unique movement labels are determined
-order = unique(movementLabels);
-coef = length(movementLabels) / length(order);
-length(movementLabels);
+order = unique(sentLabels);
+coef = length(sentLabels) / length(order);
+length(sentLabels);
 
 foldNo = 10;
 %The below built-in function helps us leverage the cross-validation method,
 %where the "k" (fold) value in this case is 10
-cv_ = cvpartition(movementLabels, 'k', foldNo);
+cv_ = cvpartition(sentLabels, 'k', foldNo);
 
 
 
-cnterAll = length(movementLabels);
+cnterAll = length(sentLabels);
 cnterSucc = 0;
 
 avgSucc = 0;
 
-orderInt = 1:length(unique(movementLabels));
+orderInt = 1:length(unique(sentLabels));
 
 avgSucc = 0;
 
@@ -106,7 +104,7 @@ for j = 1:cv_.NumTestSets
     %The below iteration is performed as to divide the data into the test
     %and training ones, whereby one tenth of the files in a movement folder
     %is chosen as the test data, being repeated 10 times.
-    for k = 1:foldNo - 1:length(movementLabels) - length(test_)
+    for k = 1:foldNo - 1:length(sentLabels) - length(test_)
         
         tra_ = [];
         for p = k:k + foldNo - 2
