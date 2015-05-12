@@ -2,13 +2,13 @@ function [posOut1, posOut2] = CheckPos(pos1, pos2, no)
 %CHECKPOS Summary of this function goes here
 %   Detailed explanation goes here
 
-rowDiff = pos1.row - pos2.row;
+rowDiff = abs(pos1.row - pos2.row);
 
 posOut1 = pos1;
 posOut2 = pos2;
 
 if rowDiff == 0
-    colDiff = pos1.col - pos2.col;
+    colDiff = abs(pos1.col - pos2.col);
 end
 
 if (pos1.row == no || pos1.row == 1) && (pos1.col ~= 1 && pos1.col ~= no)
@@ -25,8 +25,22 @@ if (pos1.row == no || pos1.row == 1) && (pos1.col ~= 1 && pos1.col ~= no)
     end
 elseif pos1.col == 1 || pos1.col == no
     if colDiff == 0
-        if pos1.row == 1 || pos1.row == no
-            posOut1.col = pos;
+        if pos1.row == 1
+            if pos1.col == 1
+                posOut1.col = (1 - colDiff);
+                posOut1.row = (1 - rowDiff);
+            else
+                posOut1.col = no - (1 - colDiff);
+                posOut1.row = (1 - rowDiff);
+            end
+        elseif pos1.row == no
+            if pos1.col == 1
+                posOut1.col = (1 - colDiff);
+                posOut1.row = no - (1 - rowDiff);
+            else
+                posOut1.col = no - (1 - colDiff);
+                posOut1.row = no - (1 - rowDiff);
+            end
         else
             addVal = 0;
             if pos1.col == no
