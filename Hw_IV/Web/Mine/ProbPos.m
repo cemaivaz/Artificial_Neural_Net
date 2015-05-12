@@ -12,6 +12,7 @@ if rowDiff == 0
 end
 
 if (pos1.row == no || pos1.row == 1) && (pos1.col ~= 1 && pos1.col ~= no)
+    
     if rowDiff == 0
         addVal = 0;
         if pos1.row == no
@@ -23,19 +24,20 @@ if (pos1.row == no || pos1.row == 1) && (pos1.col ~= 1 && pos1.col ~= no)
         
         
     end
+    
 elseif pos1.col == 1 || pos1.col == no
     if colDiff == 0
         if pos1.row == 1
             if pos1.col == 1
-                posOut1.col = (1 - colDiff);
-                posOut1.row = (1 - rowDiff);
+                posOut1.col = 1 + (1 - colDiff);
+                posOut1.row = 1 + (1 - rowDiff);
             else
                 posOut1.col = no - (1 - colDiff);
-                posOut1.row = (1 - rowDiff);
+                posOut1.row = 1 + (1 - rowDiff);
             end
         elseif pos1.row == no
             if pos1.col == 1
-                posOut1.col = (1 - colDiff);
+                posOut1.col = 1 + (1 - colDiff);
                 posOut1.row = no - (1 - rowDiff);
             else
                 posOut1.col = no - (1 - colDiff);
