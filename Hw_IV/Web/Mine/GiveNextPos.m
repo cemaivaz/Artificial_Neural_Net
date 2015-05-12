@@ -9,19 +9,7 @@ switch actionIndex
        nextPos.col = curPos.col - 1;
    case 4 % north
        nextPos.row = curPos.row - 1;
-   case 5 % northeast 
-       nextPos.col = curPos.col + 1;
-       nextPos.row = curPos.row - 1;
-   case 6 % southeast 
-       nextPos.col = curPos.col + 1;
-       nextPos.row = curPos.row + 1;
-   case 7 % southwest
-       nextPos.col = curPos.col - 1;
-       nextPos.row = curPos.row + 1;
-   case 8 % northwest
-       nextPos.col = curPos.col - 1;
-       nextPos.row = curPos.row - 1;
-   case 9 % hold
+   case 5 % hold
        nextPos = curPos;
    otherwise
       disp(sprintf('invalid action index: %d', actionIndex))

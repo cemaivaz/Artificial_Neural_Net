@@ -9,7 +9,7 @@
 % sina@sinairv.com
 % Please send your comments or bug reports to the above email address.
 
-close all;
+clos
 clear all;
 clc
 
@@ -76,14 +76,8 @@ for ei = 1:episodeCount,
         % update Q: Sarsa
         curQ = Q(curpos.row, curpos.col, a);
         nextQ = qmax; %Q(nextpos.row, nextpos.col, a_next);
-        %Q(curpos.row, curpos.col, a) = curQ + alpha*(r + gamma*nextQ - curQ);
-        
+        Q(curpos.row, curpos.col, a) = curQ + alpha*(r + gamma*nextQ - curQ);
     
-        Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
-        Q(curpos.row, curpos.col, a) = .25 * (curQ + alpha*(r + gamma*nextQ - curQ));
-        Q(curpos.row, curpos.col, a) = .25 * (curQ + alpha*(r + gamma*nextQ - curQ));
-        
-        
         curpos = nextpos; a = a_next;
     end % states in each episode
     
