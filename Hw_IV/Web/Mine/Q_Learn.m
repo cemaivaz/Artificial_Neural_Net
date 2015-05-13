@@ -26,7 +26,9 @@ selectedEpisodes = [20 200 700 1000 2000];
 isKing = 0;
 canHold = 0;
 
-start.row = 1;
+startrow = 1;
+
+start.row = gridrows - startrow + 1;
 start.col = 1;
 goal.row = 7;
 goal.col = 6;
@@ -127,7 +129,7 @@ for ei = 1:episodeCount,
 
 %         curpos = nextpos;
 %         a = a_next;
-        epsilon = epsilon * 0.919;
+        epsilon = epsilon * 0.922;
     end % states in each episode
     
     % if the current state of the world is going to be drawn ...
@@ -158,6 +160,29 @@ for ei = 1:episodeCount,
 end % episodes loop
 
 
+[max_, ind_] = max(Q, [], 3);
+fprintf('Max_a Q(s, a):\n');
+max_
+
+fprintf('\n\nOptimal actions:\n');
+%indDir = zeros(size(ind_,1), size(ind_, 2));
+for i = 1:size(ind_, 1)
+    for j = 1:size(ind_, 2)
+        switch ind_(i, j)
+            case 1
+                indDir{i, j} = 'E';
+            case 2
+                indDir{i, j} = 'S';
+            case 3
+                indDir{i, j} = 'W';
+            case 4
+                indDir{i, j} = 'N';
+            otherwise
+                indDir{i, j} = '_';
+        end
+    end
+end
+indDir
 
 
 
