@@ -48,6 +48,7 @@ for ei = 1:episodeCount,
     
  
     
+    epsilon = 0.9;
     %epsilon or greedy
     if(rand > epsilon) % greedy
         [qmax, a] = max(Q(curpos.row,curpos.col,:));
@@ -55,9 +56,11 @@ for ei = 1:episodeCount,
         a = IntRand(1, actionCount);
     end
 
+
     %epsilon = epsilon * 0.975;
     episodeFinished = 0;
     while(episodeFinished == 0)
+       
         % take action a, observe r, and nextpos
         nextpos = GiveNextPos(curpos, a, gridcols, gridrows);
         if(PosCmp(nextpos, goal) == 0), 
@@ -76,6 +79,7 @@ for ei = 1:episodeCount,
             a_next = IntRand(1, actionCount);
         end
         
+        
         % update Q: Sarsa
         curQ = Q(curpos.row, curpos.col, a);
         nextQ = qmax; %Q(nextpos.row, nextpos.col, a_next);
@@ -87,24 +91,43 @@ for ei = 1:episodeCount,
 
         [orthogSt1, orthogSt2] = ProbPos(curpos, destPos, gridrows);
         
-        fprintf('___');
-        curpos
-        a_next
-        destPos
-        fprintf('//////');
-        orthogSt1
+%         fprintf('___');
+%         curpos
+%         a_next
+%         destPos
+%         fprintf('//////');
+%         orthogSt1
+%         
+%         orthogSt2
         
-        orthogSt2
+        directRand = rand;
+        [orthogVal1, a_next_ort1] = max(Q(orthogSt1.row,orthogSt1.col,:));
+        [orthogVal2, a_next_ort2] = max(Q(orthogSt2.row,orthogSt2.col,:));
         
-        orthogVal1 = max(Q(orthogSt1.row,orthogSt1.col,:));
-        orthogVal2 = max(Q(orthogSt2.row,orthogSt2.col,:));
+        if directRand <= 0.5
+            Q(curpos.row, curpos.col, a) = (curQ + alpha*(r + gamma*nextQ - curQ));
+            curpos = nextpos;
+            a = a_next;
+        elseif directRand > 0.5 && directRand <= 0.75
+            Q(curpos.row, curpos.col, a) = (curQ + alpha*(r + gamma*orthogVal1 - curQ));
+            curpos = orthogSt1;
+            a = a_next_ort1;
+        else
+            Q(curpos.row, curpos.col, a) = (curQ + alpha*(r + gamma*orthogVal2 - curQ));
+            curpos = orthogSt2;
+            a = a_next_ort2;
+        end
         
-        Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
-        Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal1 - curQ));
-        Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal2 - curQ));
+
         
+%         Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
+%         Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal1 - curQ));
+%         Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal2 - curQ));
         
-        curpos = nextpos; a = a_next;
+
+%         curpos = nextpos;
+%         a = a_next;
+        epsilon = epsilon * 0.919;
     end % states in each episode
     
     % if the current state of the world is going to be drawn ...
