@@ -79,23 +79,29 @@ for ei = 1:episodeCount,
         % update Q: Sarsa
         curQ = Q(curpos.row, curpos.col, a);
         nextQ = qmax; %Q(nextpos.row, nextpos.col, a_next);
-        Q(curpos.row, curpos.col, a) = curQ + alpha*(r + gamma*nextQ - curQ);
+%         Q(curpos.row, curpos.col, a) = curQ + alpha*(r + gamma*nextQ - curQ);
         
         
-%         destPos = GiveNextPos(curpos, a_next, gridcols, gridrows);
-%         
-% %         fprintf('___');
-% %         curpos
-% %         a_next
-% %         destPos
-%         [orthogSt1, orthogSt2] = ProbPos(curpos, destPos, gridrows);
-%     
-%         orthogVal1 = max(Q(orthogSt1.row,orthogSt1.col,:));
-%         orthogVal2 = max(Q(orthogSt2.row,orthogSt2.col,:));
-%         
-%         Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
-%         Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal1 - curQ));
-%         Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal2 - curQ));
+        destPos = GiveNextPos(curpos, a_next, gridcols, gridrows);
+        
+
+        [orthogSt1, orthogSt2] = ProbPos(curpos, destPos, gridrows);
+        
+        fprintf('___');
+        curpos
+        a_next
+        destPos
+        fprintf('//////');
+        orthogSt1
+        
+        orthogSt2
+        
+        orthogVal1 = max(Q(orthogSt1.row,orthogSt1.col,:));
+        orthogVal2 = max(Q(orthogSt2.row,orthogSt2.col,:));
+        
+        Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
+        Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal1 - curQ));
+        Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal2 - curQ));
         
         
         curpos = nextpos; a = a_next;

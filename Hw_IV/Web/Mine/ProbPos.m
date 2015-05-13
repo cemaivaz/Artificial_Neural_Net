@@ -5,7 +5,7 @@ function [posOut1, posOut2] = ProbPos(pos1, pos2, no)
 rowDiff = abs(pos1.row - pos2.row);
 
 posOut1 = pos1;
-posOut2 = pos2;
+posOut2 = pos1;
 colDiff = 0;
 if rowDiff == 0
     colDiff = abs(pos1.col - pos2.col);
