@@ -37,7 +37,7 @@ if(isKing ~= 0),  actionCount = 8; else actionCount = 4; end
 if(canHold ~= 0 && isKing ~= 0), actionCount = actionCount + 1; end
 
 % initialize Q with zeros
-Q = zeros(gridrows, gridcols, actionCount);
+Q = rand(gridrows, gridcols, actionCount);
 
 a = 0; % an invalid action
 % loop through episodes
@@ -63,9 +63,9 @@ for ei = 1:episodeCount,
         if(PosCmp(nextpos, goal) == 0), 
             episodeFinished = 1;
             r = 100; 
-        elseif(nextpos.row == gridrows && 1 < nextpos.col && nextpos.col < gridcols) 
-            episodeFinished = 1;
-            r = 0; 
+%         elseif(nextpos.row == gridrows && 1 < nextpos.col && nextpos.col < gridcols) 
+%             episodeFinished = 1;
+%             r = 0; 
         else
             r = 0;
         end
@@ -82,15 +82,20 @@ for ei = 1:episodeCount,
         Q(curpos.row, curpos.col, a) = curQ + alpha*(r + gamma*nextQ - curQ);
         
         
-        destPos = GiveNextPos(curpos, a_next, gridcols, gridrows);
-        [orthogSt1, orthogSt2] = ProbPos(curpos, destPos, gridrows);
-    
-        orthogVal1 = max(Q(orthogSt1.row,orthogSt1.col,:));
-        orthogVal2 = max(Q(orthogSt2.row,orthogSt2.col,:));
-        
-        Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
-        Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal1 - curQ));
-        Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal2 - curQ));
+%         destPos = GiveNextPos(curpos, a_next, gridcols, gridrows);
+%         
+% %         fprintf('___');
+% %         curpos
+% %         a_next
+% %         destPos
+%         [orthogSt1, orthogSt2] = ProbPos(curpos, destPos, gridrows);
+%     
+%         orthogVal1 = max(Q(orthogSt1.row,orthogSt1.col,:));
+%         orthogVal2 = max(Q(orthogSt2.row,orthogSt2.col,:));
+%         
+%         Q(curpos.row, curpos.col, a) = .5 * (curQ + alpha*(r + gamma*nextQ - curQ));
+%         Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal1 - curQ));
+%         Q(curpos.row, curpos.col, a) = Q(curpos.row, curpos.col, a) + .25 * (curQ + alpha*(r + gamma*orthogVal2 - curQ));
         
         
         curpos = nextpos; a = a_next;
