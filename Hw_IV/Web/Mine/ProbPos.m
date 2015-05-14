@@ -14,7 +14,7 @@ end
 if (pos1.row == no || pos1.row == 1) && (pos1.col ~= 1 && pos1.col ~= no)
     if rowDiff == 0 && colDiff == 0 %Bump into the wall
         posOut1.col = pos1.col + 1;
-        posOut2.col = pos1.col + 1;
+        posOut2.col = pos1.col - 1;
         
         
     elseif rowDiff == 0
@@ -51,7 +51,7 @@ elseif pos1.col == 1 || pos1.col == no
                         posOut1.col = pos1.col - 1;
                         posOut2.row = pos1.row + 1;
                     else
-                        posOut1.col = pos1.col - 1;
+                        posOut1.col = pos1.col + 1;
                         posOut2.row = pos1.row + 1;
                     end
                 end

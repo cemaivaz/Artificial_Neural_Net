@@ -94,14 +94,14 @@ for ei = 1:episodeCount,
 
         [orthogSt1, orthogSt2] = ProbPos(curpos, destPos, gridrows);
         
-        fprintf('___');
-        curpos
-        a_next
-        destPos
-        fprintf('//////');
-        orthogSt1
-        
-        orthogSt2
+%         fprintf('___');
+%         curpos
+%         a_next
+%         destPos
+%         fprintf('//////');
+%         orthogSt1
+%         
+%         orthogSt2
         
         directRand = rand;
         [orthogVal1, a_next_ort1] = max(Q(orthogSt1.row,orthogSt1.col,:));
