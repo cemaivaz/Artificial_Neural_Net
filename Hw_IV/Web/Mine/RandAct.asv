@@ -1,0 +1,4 @@
+function randOut = RandAct(upperBound)
+randOut = floor((upperBound - 1 ) * rand + 1);
+
+randOut = (rand * upperBound);
