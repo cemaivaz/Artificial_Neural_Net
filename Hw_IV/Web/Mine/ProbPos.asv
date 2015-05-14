@@ -37,23 +37,17 @@ elseif pos1.col == 1 || pos1.col == no
                 posOut2.row = pos1.row - 1;
             else
                 if pos1.row == no
-                    
+                    addVal = 0;
                     if pos1.col == no
-                        posOut1.col = pos1.col - 1;
-                        posOut2.row = pos1.row - 1;
+                        addVal = -1;
                     else
-                        posOut1.col = pos1.col + 1;
-                        posOut2.row = pos1.row - 1;
+                        addVal = 1;
                     end
-
+                    posOut1.col = pos1.col + addVal;
+                    posOut2.row = pos1.row + addVal;
                 else
-                    if pos1.col == no
-                        posOut1.col = pos1.col - 1;
-                        posOut2.row = pos1.row + 1;
-                    else
-                        posOut1.col = pos1.col - 1;
-                        posOut2.row = pos1.row + 1;
-                    end
+                    posOut1.row = pos1.row - 1;
+                    posOut2.col = pos2.col + 1;
                 end
             end
         elseif pos1.row == 1

@@ -27,10 +27,11 @@ isKing = 0;
 canHold = 0;
 
 startrow = 1;
+goalrow = 7;
 
 start.row = gridrows - startrow + 1;
 start.col = 1;
-goal.row = 7;
+goal.row = gridrows - goalrow + 1;
 goal.col = 6;
 
 
@@ -93,14 +94,14 @@ for ei = 1:episodeCount,
 
         [orthogSt1, orthogSt2] = ProbPos(curpos, destPos, gridrows);
         
-%         fprintf('___');
-%         curpos
-%         a_next
-%         destPos
-%         fprintf('//////');
-%         orthogSt1
-%         
-%         orthogSt2
+        fprintf('___');
+        curpos
+        a_next
+        destPos
+        fprintf('//////');
+        orthogSt1
+        
+        orthogSt2
         
         directRand = rand;
         [orthogVal1, a_next_ort1] = max(Q(orthogSt1.row,orthogSt1.col,:));
@@ -182,6 +183,7 @@ for i = 1:size(ind_, 1)
         end
     end
 end
+%Bump into the wall? HOLD!
 indDir
 
 
