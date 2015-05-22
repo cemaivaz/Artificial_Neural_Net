@@ -55,13 +55,6 @@ for i = 1:size(valsAll_, 1)
     
     exclLabels = exclLabels(1:3);
     
-    maxLabel = mode(exclLabels);
-    if maxLabel == movementLabels_(i)
-        pos_ = pos_ + 1;
-        
-    else
-        neg_ = neg_ + 1;
-    end
     
     %     if ind_ > floor(size(valsAll_, 1) / 2)
     %         pos_ = pos_ + 1;
@@ -73,4 +66,5 @@ for i = 1:size(valsAll_, 1)
 %     neg_
 end
 
-fprintf('Success rate: %.2f%%', pos_ / (pos_ + neg_));
+neg_
+pos_
