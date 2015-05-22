@@ -1,5 +1,9 @@
-file_ = 1;
+clear
+close
+clc
 
+file_ = 1;
+%Success rate: 56.36%
 
 
 if file_ == 1
@@ -31,107 +35,89 @@ else
 end
 
 
-neg_ = 0;
-pos_ = 0;
 
-
-
-
-
-foldNo = 5;
+foldNo = 10;
 %The below built-in function helps us leverage the cross-validation method,
 %where the "k" (fold) value in this case is 10
 cv_ = cvpartition(movementLabels_, 'k', foldNo);
 
-cosineCoeff = zeros(1, length(movementLabels_));
-for i = 1:size(cosineCoeff, 2)
-    cosineCoeff(i) = (sum(movementLabels_(i) .^ 2)) .^ .5;
-end
+
 
 dataLength = length(valsAll_);
+cntVal = 0;
+succ = 0;
+fprintf('kNN model is being trained..');
 for j = 1:cv_.NumTestSets
     
-    trInd = cv_.training(j)
-    testInd = cv_.test(j)
+    trInd = cv_.training(j);
+    testInd = cv_.test(j);
     
     
     trDat = valsAll_(trInd, :);
     testDat = valsAll_(testInd, :);
     
     trLabels = movementLabels_(trInd);
-    testLabels = 
+    testLabels = movementLabels_(testInd);
     
-    for i = 1:length(testDat)
-        diff_ = zeros(size(valsAll_, 1) - 1);
-        diffInd_ = zeros(size(valsAll_, 1) - 1);
+    
+    diff_ = zeros(size(trDat, 1));
+    diffInd_ = zeros(size(trDat, 1));
+    
+    neg_ = 0;
+    pos_ = 0;
+    
+    
+
+
+
+    for i = 1:size(testDat, 1)
+
         ind_ = 1;
         max_ = -1;
-        for j = 1:size(valsAll_, 1)
-            if i ~= j
-                diff = sum((valsAll_(i, :) - valsAll_(j, :)) .^ 2);
-                diff_(j) = diff;
+        testCos = sum(testDat(i, :) .^ 2) .^ .5;
+        for k = 1:size(trDat, 1)
+
+            trCos = sum(trDat(k, :) .^ 2) .^ .5;
+            if i ~= k
+                diff = sum(testDat(i, :) .* trDat(k, :)) / (testCos * trCos);
+                
+                diff_(k) = diff;
                 
             end
             
         end
-        diffInd_ = 1:size(valsAll_, 1);
+        diffInd_ = 1:size(trDat, 1);
         diffInd_(diffInd_ == i) = [];
-        [sorted indices] = sort(diff_);
+        [sorted, indices] = sort(diff_);
         
-        exclLabels = movementLabels_(indices);
+        exclLabels = trLabels(indices);
         
         exclLabels = exclLabels(1:3);
         
         maxLabel = mode(exclLabels);
-        if maxLabel == movementLabels_(i)
+        if maxLabel == testLabels(i)
             pos_ = pos_ + 1;
             
         else
             neg_ = neg_ + 1;
         end
-        
+        i
+        testLabels(i)
+        pos_
+        neg_
+        fprintf('--')
     end
     
+    fprintf('*************');
+    succ = succ + pos_ / (pos_ + neg_)
     
     
     
+    cntVal = cntVal + 1;
     
-    
-    
-    
+    break;
 end
 
 
 
-for i = 1:size(valsAll_, 1)
-    diff_ = zeros(size(valsAll_, 1) - 1);
-    diffInd_ = zeros(size(valsAll_, 1) - 1);
-    ind_ = 1;
-    max_ = -1;
-    for j = 1:size(valsAll_, 1)
-        if i ~= j
-            diff = sum((valsAll_(i, :) - valsAll_(j, :)) .^ 2);
-            diff_(j) = diff;
-            
-        end
-        
-    end
-    diffInd_ = 1:size(valsAll_, 1);
-    diffInd_(diffInd_ == i) = [];
-    [sorted indices] = sort(diff_);
-    
-    exclLabels = movementLabels_(indices);
-    
-    exclLabels = exclLabels(1:3);
-    
-    maxLabel = mode(exclLabels);
-    if maxLabel == movementLabels_(i)
-        pos_ = pos_ + 1;
-        
-    else
-        neg_ = neg_ + 1;
-    end
-    
-end
-
-fprintf('Success rate: %.2f%%', pos_ / (pos_ + neg_));
+fprintf('Success rate: %.2f%%', succ / cntVal);

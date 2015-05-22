@@ -66,20 +66,47 @@ for j = 1:cv_.NumTestSets
     neg_ = 0;
     pos_ = 0;
     
+    %%
+    %All training data is shown below
+    
+    
+    %Below do we find the eigenvectors for PCA
+
+    trPCAmatr = trDat;
+    trPCAmatr = trDat - repmat(mean(trPCAmatr), size(trPCAmatr, 1), 1);
+    covAll = cov(trPCAmatr);
+    
+    [eigenVec, eigenVal] = eig(covAll);
+    
+    %We try to get the eigenvectors having highest eigenvalues below
+    [Ei, ord] = sort(diag(eigenVal));
+    eigenVec = eigenVec(:,ord);
+    
+    
+    
+    %We get the biggest eigenvectors below
+    dimNo = 8;
+    eigenVec = eigenVec(:,end:-1:(end - dimNo));
+
+
+    %%
     
 
-
-
+    trDat = trDat * eigenVec;
+    
     for i = 1:length(testDat)
 
+        
+        
         ind_ = 1;
         max_ = -1;
-        testCos = sum(testDat(i, :) .^ 2) .^ .5;
+        testDatPCA = testDat(i, :) * eigenVec;
+        testCos = sum(testDatPCA .^ 2) .^ .5;
         for k = 1:size(trDat, 1)
 
             trCos = sum(trDat(i, :) .^ 2) .^ .5;
             if i ~= k
-                diff = sum(testDat(i, :) .* trDat(k, :)) / (testCos * trCos);
+                diff = sum(testDatPCA .* trDat(k, :)) / (testCos * trCos);
                 
                 diff_(k) = diff;
                 
@@ -102,12 +129,12 @@ for j = 1:cv_.NumTestSets
             neg_ = neg_ + 1;
         end
         i
+        neg_
         pos_
-        ne
     end
     
     
-    succ = succ + pos_ / (pos_ + neg_);
+    succ = succ + pos_ / (pos_ + neg_)
     
     
     
