@@ -42,7 +42,7 @@ foldNo = 10;
 cv_ = cvpartition(movementLabels_, 'k', foldNo);
 
 
-
+kNNno = 3;
 dataLength = length(valsAll_);
 cntVal = 0;
 succ = 0;
@@ -60,8 +60,6 @@ for j = 1:cv_.NumTestSets
     testLabels = movementLabels_(testInd);
     
     
-    diff_ = zeros(size(trDat, 1));
-    diffInd_ = zeros(size(trDat, 1));
     
     neg_ = 0;
     pos_ = 0;
@@ -69,7 +67,9 @@ for j = 1:cv_.NumTestSets
     
 
 
-
+    diff_ = zeros(size(trDat, 1), 1);
+    diffInd_ = zeros(size(trDat, 1));
+    
     for i = 1:size(testDat, 1)
 
         ind_ = 1;
@@ -78,21 +78,19 @@ for j = 1:cv_.NumTestSets
         for k = 1:size(trDat, 1)
 
             trCos = sum(trDat(k, :) .^ 2) .^ .5;
-            if i ~= k
-                diff = sum(testDat(i, :) .* trDat(k, :)) / (testCos * trCos);
-                
-                diff_(k) = diff;
-                
-            end
+            
+            diff = sum(testDat(i, :) .* trDat(k, :)) / (testCos * trCos);
+            
+            diff_(k) = diff;
             
         end
         diffInd_ = 1:size(trDat, 1);
-        diffInd_(diffInd_ == i) = [];
+        %diffInd_(diffInd_ == i) = [];
         [sorted, indices] = sort(diff_);
         
         exclLabels = trLabels(indices);
         
-        exclLabels = exclLabels(1:3);
+        exclLabels = exclLabels(end:-1:end - kNNno + 1);
         
         maxLabel = mode(exclLabels);
         if maxLabel == testLabels(i)
@@ -118,6 +116,27 @@ for j = 1:cv_.NumTestSets
     break;
 end
 
+
+% for k = 7000:size(size_, 1)
+%     testCos = sum(size_(k, :) .^ 2) .^ .5;
+%     max_ = -Inf;
+%     indd_ = -1;
+%     for i = 1:size(size_, 1)
+%         
+%         if i ~= k
+%             trCos = sum(size_(i, :) .^ 2) .^ .5;
+%             diff = sum(size_(k, :) .* size_(i, :)) / (testCos * trCos);
+%             
+%             if diff > max_
+%                 max_ = diff;
+%                 indd_ = i;
+%             end
+%         end
+%         
+%         
+%     end
+%     fprintf('%d vs. %d\n', movementLabels_(k), movementLabels_(indd_))
+% end
 
 
 fprintf('Success rate: %.2f%%', succ / cntVal);

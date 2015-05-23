@@ -3,7 +3,7 @@ close
 clc
 
 file_ = 1;
-
+%Success rate: 56.36%
 
 
 if file_ == 1
@@ -36,7 +36,7 @@ end
 
 
 
-foldNo = 5;
+foldNo = 10;
 %The below built-in function helps us leverage the cross-validation method,
 %where the "k" (fold) value in this case is 10
 cv_ = cvpartition(movementLabels_, 'k', foldNo);
@@ -70,14 +70,14 @@ for j = 1:cv_.NumTestSets
 
 
 
-    for i = 1:length(testDat)
+    for i = 1:size(testDat, 1)
 
         ind_ = 1;
         max_ = -1;
         testCos = sum(testDat(i, :) .^ 2) .^ .5;
         for k = 1:size(trDat, 1)
 
-            trCos = sum(trDat(i, :) .^ 2) .^ .5;
+            trCos = sum(trDat(k, :) .^ 2) .^ .5;
             if i ~= k
                 diff = sum(testDat(i, :) .* trDat(k, :)) / (testCos * trCos);
                 
@@ -102,19 +102,54 @@ for j = 1:cv_.NumTestSets
             neg_ = neg_ + 1;
         end
         i
+        testLabels(i)
         pos_
-        ne
+        neg_
+        fprintf('--')
     end
     
-    
-    succ = succ + pos_ / (pos_ + neg_);
-    
+    fprintf('*************');
+    succ = succ + pos_ / (pos_ + neg_)
     
     
     
     cntVal = cntVal + 1;
+    
+    break;
 end
 
 
+for k = 7080:size(size_, 1)
+    testCos = sum(size_(k, :) .^ 2) .^ .5;
+    max_ = -Inf;
+    indd_ = -1;
+    for i = 1:size(size_, 1)
+        
+        if i ~= k
+            trCos = sum(size_(i, :) .^ 2) .^ .5;
+            diff = sum(size_(k, :) .* size_(i, :)) / (testCos * trCos);
+            
+            if diff > max_
+                max_ = diff;
+                indd_ = i;
+            end
+        end
+        
+        
+    end
+    fprintf('%d vs. %d', movementLabels_(k), movementLabels_(indd_))
+end
 
+
+testCos = sum(testDat(i, :) .^ 2) .^ .5;
+        for k = 1:size(trDat, 1)
+
+            trCos = sum(trDat(k, :) .^ 2) .^ .5;
+            if i ~= k
+                diff = sum(testDat(i, :) .* trDat(k, :)) / (testCos * trCos);
+                
+                diff_(k) = diff;
+                
+            end
+            
 fprintf('Success rate: %.2f%%', succ / cntVal);
